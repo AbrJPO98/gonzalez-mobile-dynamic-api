@@ -29,7 +29,6 @@ Este documento lista las **líneas nuevas** (campos/relaciones) añadidas en los
 - `c_empleado_almuerzo                                          c_empleado_almuerzo[]`
 - `c_empleado_notification                                      c_empleado_notification[]`
 - `c_encuesta_cliente                                           c_encuesta_cliente[]`
-- `c_puesto_notas_bitacora_cambios                              c_puesto_notas_bitacora_cambios[]`
 - `c_salida_anticipada                                          c_salida_anticipada[]`
 - `c_solicitud_permiso                                          c_solicitud_permiso[]`
 - `e_capacitacion_empleado                                      e_capacitacion_empleado[]`
@@ -51,7 +50,9 @@ Este documento lista las **líneas nuevas** (campos/relaciones) añadidas en los
 
 - `empleado_id            Int?`
 - `motivo                 String?            @db.LongText`
+- `c_marca_dia            c_marca_dia[]`
 - `c_empleado             c_empleado?        @relation(fields: [empleado_id], references: [id], onDelete: Cascade)`
+
 - `@@index([empleado_id], map: "c_salida_anticipada_empleado_id_fkey")`
 
 ## 6. `e_estructura_articulo_corpo_puesto_entrega`
