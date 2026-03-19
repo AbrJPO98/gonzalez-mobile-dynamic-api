@@ -45,59 +45,39 @@ incluye el bloque de **“Total preexistentes”**, donde se listan las tablas p
 
 ---
 
-### 3. Configuración de Prisma
+### 3. Adaptación de base de datos (SQL)
 
-El cliente de Prisma se configura a través de:
+Para adaptar la base de datos a los cambios de MonitoreApp, ejecutar:
 
-- `app/prisma/schema.prisma`
-- `utils/prismaClient.ts`
+- `Install & config/docs/Cambios_BD_MonitoreApp.sql`
 
-Para que Prisma funcione correctamente, es necesario:
+Antes de ejecutar ese script, debes seleccionar explícitamente la base de datos destino:
 
-1. **Crear un archivo `.env`** en `apps/server` (o en el root indicado por la configuración de Prisma), basado en:
-   - `.env.example`
+```sql
+USE `db_name`;
+```
 
-2. Asegurarse de definir al menos:
-   - `DATABASE_URL` apuntando a la instancia de base de datos adecuada.
-   - Cualquier otra variable requerida por el proyecto (por ejemplo, `MOBILE_ACCESS_TOKEN`, `JWT_SECRET`, etc., según el contenido de `.env.example`).
+> Reemplaza `db_name` por el nombre real de la base en la que aplicarás los cambios.
 
 ---
 
-### 4. Comandos básicos de Prisma (migraciones)
+### 4. Configuración de Prisma
 
-> Asegúrate de que `DATABASE_URL` apunte a la base correcta antes de ejecutar migraciones.
+Después de hacer cambios en la base de datos, ejecuta:
 
-Dentro del directorio del servidor (por ejemplo `apps/server`), los comandos típicos de Prisma son:
+```bash
+npx prisma db pull
+```
 
-- **Obtener el model actual de la base de datos** (antes de realizar migraciones):
+para traer el estado actual de la base de datos al `schema.prisma`.
 
-  ```bash
-  npx prisma db pull
-  ```
+Luego ejecuta:
 
-- **Crear una nueva migración** (añadir o modificar tablas/campos en `schema.prisma`):
+```bash
+npx prisma generate
+```
 
-  ```bash
-  npx prisma migrate dev --name nombre_de_la_migracion
-  ```
-
-- **Generar cliente de Prisma** (tras cambios en `schema.prisma`):
-
-  ```bash
-  npx prisma generate
-  ```
-
-  Esto:
-  - Actualiza el esquema de la base de datos local.
-  - Genera una nueva carpeta de migración en `app/prisma/migrations`.
-
-- **Aplicar migraciones en un entorno específico** (por ejemplo, producción / staging):
-
-  ```bash
-  npx prisma migrate deploy
-  ```
-
-> Para más información, consulte la documentación oficial de prisma para realizar cambios sin comprometer el estado actual
+para actualizar/modificar el cliente de Prisma con esos cambios.
 
 ---
 
@@ -116,20 +96,14 @@ En particular:
   - Renombrar tablas o columnas.)
 
   entonces:
-  1. **Revisar y actualizar `schema.prisma`** para que siga reflejando fielmente la estructura de la base (incluyendo relaciones, índices, tipos, etc.).
-  2. **Reiniciar o ajustar las migraciones de Prisma** para adaptar la API dinámica a los nuevos cambios de esquema:
-     - Dependiendo de la política del proyecto, esto puede implicar:
-       - Crear nuevas migraciones que apliquen los cambios de forma incremental, o
-       - En entornos de desarrollo, regenerar todo el esquema de prisma (Lo que no implica reiniciar la base de datos, solamente el esquema de prisma y sus migraciones).
-  3. **Ejecutar `npx prisma generate`** para actualizar el cliente de Prisma.
-  4. **Probar los flujos afectados** (endpoints y pantallas móviles correspondientes).
+  1. **Revisar y actualizar `schema.prisma`** con los comandos anteriormente mencionados para que siga reflejando fielmente la estructura de la base (incluyendo relaciones, índices, tipos, etc.).
+  2. **Probar los flujos afectados** (endpoints y pantallas móviles correspondientes).
 
 - Además, **es obligatorio informar al equipo de Udevs** cuando se realicen cambios en estas tablas preexistentes, para que puedan:
-  - Adaptar el servicio que brinda la API dinámica a los nuevos cambios de esquema.
+  - Adaptar el servicio que brinda la app mobile a los nuevos cambios de esquema.
   - Actualizar, si es necesario, el mapeo y las validaciones que se realizan del lado de la infraestructura o servicios auxiliares.
 
 > En resumen: los cambios en tablas listadas como “Total preexistentes” deben ser tratados como cambios de contrato entre la base de datos corporativa y la API dinámica.
-> Esto requiere coordinación y migraciones controladas, no simples modificaciones ad-hoc.
 
 ---
 
@@ -140,8 +114,11 @@ En particular:
   - `Tablas nuevas del schema.txt`
   - `Tablas originales del schema.md`
   - `Listado de tablas nuevas y originales del schema.md`
-- Para usar Prisma:
-  - Crear `.env` a partir de `.env.example`.
-  - Usar `npx prisma generate` y `npx prisma migrate dev --name ...` para mantener el esquema.
+- Para adaptar la base de datos a cambios de MonitoreApp:
+  - Ejecutar `USE \`db_name\`;`
+  - Ejecutar `Install & config/docs/Cambios_BD_MonitoreApp.sql`.
+- Después de cambios en base de datos:
+  - Ejecutar `npx prisma db pull`.
+  - Ejecutar `npx prisma generate`.
 - Cualquier cambio en tablas preexistentes:
-  - Requiere adaptar `schema.prisma`, actualizar migraciones y coordinar con **Udevs** para mantener la API dinámica alineada con la base de datos de referencia.
+  - Requiere actualizar `schema.prisma`, probar los flujos afectados y coordinar con **Udevs** para mantener la API dinámica alineada con la base de referencia.
