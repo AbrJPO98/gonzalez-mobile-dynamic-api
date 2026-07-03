@@ -21,11 +21,11 @@ Esta ruta fue creada usando **Next.js** y actúa como un _proxy_ genérico hacia
 
 ### 2. Referencias de modelo y tablas utilizadas
 
-Para entender las **tablas nuevas** y las **tablas preexistentes** que se implementan en la API dinámica (y si tienen diferencias respecto a la base original), es obligatorio revisar los siguientes documentos en `apps/server/docs`:
+Para entender las **tablas nuevas** y las **tablas preexistentes** que se implementan en la API dinámica (y si tienen diferencias respecto a la base original), es obligatorio revisar los siguientes documentos en `Install & config/docs`:
 
 - `Tablas nuevas del schema.txt`
 - `Tablas originales del schema.md`
-- `Listado de tablas nuevas y tablas originales del schema.md`
+- `Listado de tablas nuevas y originales del schema.md`
 
 En estos documentos se detalla:
 
@@ -49,7 +49,7 @@ incluye el bloque de **“Total preexistentes”**, donde se listan las tablas p
 
 Para adaptar la base de datos a los cambios de MonitoreApp, ejecutar:
 
-- `Install & config/docs/Cambios_BD_MonitoreApp.sql`
+- `Install & config\docs\Cambios_BD_MonitoreApp.sql`
 
 Antes de ejecutar ese script, debes seleccionar explícitamente la base de datos destino:
 
@@ -63,7 +63,7 @@ USE `db_name`;
 
 ### 4. Configuración de Prisma
 
-Después de hacer cambios en la base de datos, ejecuta:
+Después de hacer cambios en la base de datos, ejecuta en la raíz del proyecto el comando:
 
 ```bash
 npx prisma db pull

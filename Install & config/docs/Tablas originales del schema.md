@@ -57,8 +57,9 @@ Este documento lista las **líneas nuevas** (campos/relaciones) añadidas en los
 
 ## 6. `e_estructura_articulo_corpo_puesto_entrega`
 
-### Líneas nuevas (2)
+### Líneas nuevas (3)
 
+- `modelo                               String?                                @db.VarChar(255)`
 - `c_articulo_mantenimiento             c_articulo_mantenimiento[]`
 - `c_movimientos_articulo_mantenimiento c_movimientos_articulo_mantenimiento[]`
 

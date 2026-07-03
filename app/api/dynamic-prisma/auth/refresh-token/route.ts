@@ -13,7 +13,7 @@ function hashToken(token: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const { refreshToken } = await request.json();
+    const { refreshToken, deviceName } = await request.json();
 
     if (!refreshToken) {
       return NextResponse.json(
@@ -50,6 +50,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const empleado = await prisma.c_empleado.findFirst({ where: { id: payload.id } });
+
+    if (!empleado) {
+      return NextResponse.json(
+        { status: false, message: 'Empleado inválido' },
+        { status: 401 }
+      );
+    }
     const nowCR = new Date();
     if (storedToken.expiresAt < nowCR) {
       return NextResponse.json(
@@ -74,7 +82,7 @@ export async function POST(request: NextRequest) {
         sessionId: newSessionId,
       },
       process.env.JWT_SECRET!,
-      { expiresIn: '15m' }
+      { expiresIn: '1d' }
     );
 
     const newRefreshToken = jwt.sign(
@@ -98,6 +106,16 @@ export async function POST(request: NextRequest) {
         sessionId: newSessionId,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         revoked: false,
+      },
+    });
+    
+    await prisma.c_login_marca_almuerzo.create({
+      data: {
+        nombre_empleado: (empleado.nombre || "") + " " + (empleado.primer_apellido || "") + " " + (empleado.segundo_apellido || ""),
+        cedula_empleado: empleado.cedula || "",
+        fecha_hora: nowCR,
+        device: deviceName || "",
+        session_id: newSessionId,
       },
     });
 

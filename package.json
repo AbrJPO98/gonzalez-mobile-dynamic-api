@@ -12,8 +12,11 @@
   },
   "dependencies": {
     "@prisma/client": "^6.15.0",
+    "axios": "^1.18.0",
     "bcrypt": "^6.0.0",
     "date-fns-tz": "^3.2.0",
+    "docx": "^9.6.1",
+    "exceljs": "^4.4.0",
     "jsonwebtoken": "^9.0.2",
     "next": "16.1.6",
     "react": "19.2.3",
@@ -29,7 +32,9 @@
     "eslint-config-next": "16.1.6",
     "prisma": "^6.16.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.22.3",
+    "typescript": "^5",
+    "xlsx": "^0.18.5"
   },
   "prisma": {
     "schema": "app/prisma/schema.prisma"

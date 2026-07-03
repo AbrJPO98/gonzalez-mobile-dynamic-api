@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const bcrypt = require('bcrypt');
 import crypto from 'crypto';
+import { createTokenPlanillas } from '../../../../../utils/createTokenPlanillas';
 
 function hashToken(token: string): string {
   return crypto.createHash('sha256').update(token).digest('hex');
@@ -16,7 +17,9 @@ function hashToken(token: string): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { cedula, password } = body;
+    const { cedula, password, deviceName } = body;
+
+    console.log('deviceName', deviceName);
 
     if (!cedula || !password) {
       return NextResponse.json(
@@ -56,7 +59,7 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordExpiresAt = empleado.password_expires_at ? new Date(empleado.password_expires_at) : null;
-    if (passwordExpiresAt && passwordExpiresAt < new Date()) {
+    if (passwordExpiresAt && passwordExpiresAt < toZonedTime(new Date(), 'America/Costa_Rica')) {
       return NextResponse.json(
         { status: false, passwordExpired: true, message: 'Contraseña expirada, debe cambiarla' },
         { status: 401 }
@@ -81,7 +84,7 @@ export async function POST(request: NextRequest) {
     const accessToken = jwt.sign(
       { id: empleado.id, cedula: empleado.cedula, sessionId },
       process.env.JWT_SECRET!,
-      { expiresIn: '15m' }
+      { expiresIn: '1d' }
     );
 
     const refreshToken = jwt.sign(
@@ -90,7 +93,7 @@ export async function POST(request: NextRequest) {
       { expiresIn: '7d' }
     );
 
-    const now = new Date();
+    const now = toZonedTime(new Date(), 'America/Costa_Rica');
 
     // Revocar tokens anteriores del empleado
     await prisma.refresh_token.updateMany({
@@ -106,7 +109,18 @@ export async function POST(request: NextRequest) {
         sessionId,
         createdAt: now,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        device: deviceName,
         revoked: false,
+      },
+    });
+
+    await prisma.c_login_marca_almuerzo.create({
+      data: {
+        nombre_empleado: (empleado.nombre || "") + " " + (empleado.primer_apellido || "") + " " + (empleado.segundo_apellido || ""),
+        cedula_empleado: empleado.cedula || "",
+        fecha_hora: now,
+        device: deviceName,
+        session_id: sessionId,
       },
     });
 
@@ -169,12 +183,18 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const pt = await createTokenPlanillas(empleado.id, password);
+
+    console.log(pt);
+
     return NextResponse.json(
       {
         status: true,
         message: 'Logeado con éxito',
         accessToken,
         refreshToken,
+        planillasToken: pt.planillasToken,
+        planillasTokenExpiresAt: pt.planillasTokenExpiresAt,
         createdAt: now.getTime(),
         empleado: {
           id: empleado.id,
@@ -201,4 +221,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

@@ -38,6 +38,9 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# Artefacto intermedio para regenerar Cambios_BD_MonitoreApp.sql (ver Introduccion api.md)
+Install & config/docs/_prisma_full_diff.sql
 next-env.d.ts
 
 # Others

@@ -168,6 +168,8 @@ model c_accion_personal {
   c_marca_dia                                                                                      c_marca_dia[]
   e_empleado_incumplimiento                                                                        e_empleado_incumplimiento[]
   e_empleado_incumplimiento_accion                                                                 e_empleado_incumplimiento_accion[]
+  log_accionpersonal                                                                               log_accionpersonal[]
+  log_accionpersonal_enlazada                                                                      log_accionpersonal_enlazada[]
   pg_planilla_empleado_pg_planilla_empleado_accionPersonalLicenciaMaternidad_idToc_accion_personal pg_planilla_empleado[]             @relation("pg_planilla_empleado_accionPersonalLicenciaMaternidad_idToc_accion_personal")
   pg_planilla_empleado_pg_planilla_empleado_accionPersonal_idToc_accion_personal                   pg_planilla_empleado[]             @relation("pg_planilla_empleado_accionPersonal_idToc_accion_personal")
   v_vacacion_solicitud                                                                             v_vacacion_solicitud?
@@ -357,6 +359,7 @@ model c_cambio_guardia {
   c_empleado_c_cambio_guardia_empleadoReemplaza_idToc_empleado                c_empleado           @relation("c_cambio_guardia_empleadoReemplaza_idToc_empleado", fields: [empleadoReemplaza_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_285F04339D7193A2")
   e_estructura_plazas_c_cambio_guardia_plazaReemplaza_idToe_estructura_plazas e_estructura_plazas? @relation("c_cambio_guardia_plazaReemplaza_idToe_estructura_plazas", fields: [plazaReemplaza_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_285F0433C2F7DD75")
   n_coordinador                                                               n_coordinador?       @relation(fields: [coordinador_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_285F0433E4517BDD")
+  log_cambioguardia                                                           log_cambioguardia[]
 
   @@index([accionPersonal_id], map: "IDX_285F04334558C79")
   @@index([plazaAusente_id], map: "IDX_285F043360ACC8FA")
@@ -592,6 +595,7 @@ model c_empleado {
   c_accion_personal_c_accion_personal_empleado_idToc_empleado               c_accion_personal[]                         @relation("c_accion_personal_empleado_idToc_empleado")
   c_accion_personal_linea                                                   c_accion_personal_linea[]
   c_adendas                                                                 c_adendas[]
+  c_bitacora_acciones_empleado                                              c_bitacora_acciones_empleado[]
   c_bonificaciones                                                          c_bonificaciones[]
   c_cambio_guardia_c_cambio_guardia_empleadoAusente_idToc_empleado          c_cambio_guardia[]                          @relation("c_cambio_guardia_empleadoAusente_idToc_empleado")
   c_cambio_guardia_c_cambio_guardia_empleadoReemplaza_idToc_empleado        c_cambio_guardia[]                          @relation("c_cambio_guardia_empleadoReemplaza_idToc_empleado")
@@ -645,6 +649,7 @@ model c_empleado {
   c_solicitud_permiso                                                       c_solicitud_permiso[]
   consultor_actualizacion                                                   consultor_actualizacion?
   consultor_history_checked_update                                          consultor_history_checked_update[]
+  consultor_log                                                             consultor_log[]
   d_empleado_cartas_recomendacion                                           d_empleado_cartas_recomendacion[]
   d_empleado_hoja_delincuencia                                              d_empleado_hoja_delincuencia[]
   d_empleado_otras_anotaciones                                              d_empleado_otras_anotaciones[]
@@ -673,6 +678,10 @@ model c_empleado {
   e_registro_vehiculos                                                      e_registro_vehiculos[]
   e_requerimiento_cumplido                                                  e_requerimiento_cumplido[]
   e_trabajo                                                                 e_trabajo[]
+  log_accionpersonal                                                        log_accionpersonal[]
+  log_cambioguardia_log_cambioguardia_empleadoAusente_idToc_empleado        log_cambioguardia[]                         @relation("log_cambioguardia_empleadoAusente_idToc_empleado")
+  log_cambioguardia_log_cambioguardia_empleadoReemplaza_idToc_empleado      log_cambioguardia[]                         @relation("log_cambioguardia_empleadoReemplaza_idToc_empleado")
+  log_extra                                                                 log_extra[]
   m_comodin_ausente                                                         m_comodin_ausente[]
   m_puesto_no_cubierto                                                      m_puesto_no_cubierto[]
   m_refuerzo                                                                m_refuerzo[]
@@ -980,6 +989,7 @@ model c_horario {
   fecha_reversion                                                DateTime?                              @db.DateTime(0)
   usuario_reversion                                              String?                                @db.VarChar(255)
   inactivated_by                                                 String?                                @db.VarChar(255)
+  jornada_reducida                                               Boolean?
   c_accion_personal                                              c_accion_personal[]
   c_cambio_horario_c_cambio_horario_horarioInicial_idToc_horario c_cambio_horario[]                     @relation("c_cambio_horario_horarioInicial_idToc_horario")
   c_cambio_horario_c_cambio_horario_horarioFinal_idToc_horario   c_cambio_horario[]                     @relation("c_cambio_horario_horarioFinal_idToc_horario")
@@ -989,6 +999,8 @@ model c_horario {
   c_marca_dia                                                    c_marca_dia[]
   e_estructura_horario_plaza_historial                           e_estructura_horario_plaza_historial[]
   e_estructura_plazas                                            e_estructura_plazas[]
+  log_horario                                                    log_horario[]
+  log_horario_dia                                                log_horario_dia[]
   pg_planilla_empleado                                           pg_planilla_empleado[]
 }
 
@@ -1006,6 +1018,7 @@ model c_horario_dia {
   teorico             Boolean?
   c_horario           c_horario?           @relation(fields: [horario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_E719D4BD4959F1BA")
   e_estructura_plazas e_estructura_plazas? @relation(fields: [plaza_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_E719D4BDEF34C0BD")
+  log_horario_dia     log_horario_dia[]
 
   @@index([horario_id], map: "IDX_E719D4BD4959F1BA")
   @@index([plaza_id], map: "IDX_E719D4BDEF34C0BD")
@@ -1059,6 +1072,7 @@ model c_horas_extras {
   monto_comida                                             Decimal?                    @db.Decimal(10, 2)
   tipo_doblado                                             String?                     @db.VarChar(150)
   trabajando_libre                                         Boolean?
+  reposicionDeHoras_id                                     Int?
   c_empleado_c_horas_extras_empleadoAusente_idToc_empleado c_empleado?                 @relation("c_horas_extras_empleadoAusente_idToc_empleado", fields: [empleadoAusente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3B30426475F636ED")
   c_marca_dia                                              c_marca_dia?                @relation(fields: [marcaDia_id], references: [id], onUpdate: NoAction, map: "FK_3B3042647963DFC5")
   pg_planilla_empleado                                     pg_planilla_empleado?       @relation(fields: [planillaEmpleado_id], references: [id], onUpdate: NoAction, map: "FK_3B304264799EE823")
@@ -1067,6 +1081,7 @@ model c_horas_extras {
   n_sindicato                                              n_sindicato?                @relation(fields: [sindicato_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3B3042648D7C55D2")
   c_empleado_c_horas_extras_empleado_idToc_empleado        c_empleado?                 @relation("c_horas_extras_empleado_idToc_empleado", fields: [empleado_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_3B304264952BE730")
   n_tipo_contratacion                                      n_tipo_contratacion?        @relation(fields: [tipoContratacion_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3B304264B0B41592")
+  m_reposicion_de_horas                                    m_reposicion_de_horas?      @relation(fields: [reposicionDeHoras_id], references: [id], onUpdate: NoAction, map: "FK_3B304264C49D574A")
   pg_planilla_extra_empleado                               pg_planilla_extra_empleado? @relation(fields: [planillaExtraEmpleado_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3B304264CAA77C0D")
   p_periodopago_config                                     p_periodopago_config?       @relation(fields: [periodoPago_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3B304264D2624C39")
   n_coordinador                                            n_coordinador?              @relation(fields: [coordinador_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3B304264E4517BDD")
@@ -1074,6 +1089,7 @@ model c_horas_extras {
   e_estructura_plazas                                      e_estructura_plazas?        @relation(fields: [plaza_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3B304264EF34C0BD")
   n_motivo_extra                                           n_motivo_extra?             @relation(fields: [motivo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3B304264F9E584F8")
   c_inducciones                                            c_inducciones?
+  log_extra                                                log_extra[]
   m_refuerzo                                               m_refuerzo?
 
   @@index([empleadoAusente_id], map: "IDX_3B30426475F636ED")
@@ -1090,6 +1106,7 @@ model c_horas_extras {
   @@index([categoriaEmpleado_id], map: "IDX_3B304264ED33694C")
   @@index([plaza_id], map: "IDX_3B304264EF34C0BD")
   @@index([motivo_id], map: "IDX_3B304264F9E584F8")
+  @@index([reposicionDeHoras_id], map: "IDX_3B304264C49D574A")
 }
 
 model c_incapacidad_ccss {
@@ -1098,8 +1115,13 @@ model c_incapacidad_ccss {
   salario_base_diario      Decimal                   @db.Decimal(10, 2)
   dias_subsidio            Int
   monto_subsidio_pagar     Decimal                   @db.Decimal(10, 2)
+  centro_medico_id         Int?
+  nombre_doctor            String?                   @db.VarChar(255)
   c_accion_personal        c_accion_personal?
+  n_centro_medico          n_centro_medico?          @relation(fields: [centro_medico_id], references: [id], onUpdate: NoAction, map: "FK_incapacidad_ccss_centro_medico")
   pg_pe_incapacidad_pagado pg_pe_incapacidad_pagado?
+
+  @@index([centro_medico_id], map: "IDX_incapacidad_ccss_centro_medico")
 }
 
 model c_incapacidad_ins {
@@ -1108,12 +1130,15 @@ model c_incapacidad_ins {
   numero_poliza        String?               @db.VarChar(50)
   empresa_id           Int?
   empresaPoliza_id     Int?
+  aseguradora_id       Int?
   c_accion_personal    c_accion_personal?
   e_estructura_empresa e_estructura_empresa? @relation(fields: [empresa_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_80539B87521E1991")
   n_empresa_poliza     n_empresa_poliza?     @relation(fields: [empresaPoliza_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_80539B87DE78DC57")
+  n_aseguradora        n_aseguradora?        @relation(fields: [aseguradora_id], references: [id], onUpdate: NoAction, map: "FK_incapacidad_ins_aseguradora")
 
   @@index([empresa_id], map: "IDX_80539B87521E1991")
   @@index([empresaPoliza_id], map: "IDX_80539B8779CCE94D")
+  @@index([aseguradora_id], map: "IDX_incapacidad_ins_aseguradora")
 }
 
 model c_induccion {
@@ -1270,7 +1295,7 @@ model c_marca_dia {
   fecha                                                               DateTime                          @db.Date
   hora_inicio                                                         DateTime?                         @db.Time(0)
   hora_fin                                                            DateTime?                         @db.Time(0)
-  horas_duracion                                                      Decimal?                          @db.Decimal(10, 0)
+  horas_duracion                                                      Decimal?                          @db.Decimal(10, 2)
   tipo_turno                                                          String?                           @db.VarChar(1)
   hora_entrada                                                        DateTime?                         @db.Time(0)
   hora_entrada_digitada                                               DateTime?                         @db.DateTime(0)
@@ -1311,7 +1336,6 @@ model c_marca_dia {
   marcaEnInduccion_id                                                 Int?
   marcaComoReemplazo2_id                                              Int?
   is_cubierto_como_comodin                                            Boolean?
-  salida_anticipada_id                                                Int?
   usuarioMarcaEntrada                                                 String?
   c_cambio_guardia_c_cambio_guardia_marcaDiaReemplaza_idToc_marca_dia c_cambio_guardia?                 @relation("c_cambio_guardia_marcaDiaReemplaza_idToc_marca_dia")
   c_cambio_guardia_c_cambio_guardia_marcaDiaAusente_idToc_marca_dia   c_cambio_guardia?                 @relation("c_cambio_guardia_marcaDiaAusente_idToc_marca_dia")
@@ -1343,7 +1367,6 @@ model c_marca_dia {
   e_estructura_plazas                                                 e_estructura_plazas?              @relation(fields: [plaza_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_583C45E5EF34C0BD")
   n_motivo_error_asignacion                                           n_motivo_error_asignacion?        @relation(fields: [motivoErrorAsignacion_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_583C45E5F9838DA4")
   c_empleado_c_marca_dia_empleadoReemplaza2_idToc_empleado            c_empleado?                       @relation("c_marca_dia_empleadoReemplaza2_idToc_empleado", fields: [empleadoReemplaza2_id], references: [id], onUpdate: NoAction, map: "FK_583C45E5FC9C312A")
-  c_salida_anticipada                                                 c_salida_anticipada?              @relation(fields: [salida_anticipada_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "c_marca_dia_salida_anticipada_id_fkey")
   e_estructura_dia_excepcion_plaza                                    e_estructura_dia_excepcion_plaza?
   m_comodin_ausente                                                   m_comodin_ausente[]
   m_operacion                                                         m_operacion[]
@@ -1386,7 +1409,8 @@ model c_marca_dia {
   @@index([tipo_turno], map: "tipoTurno_idx")
   @@index([usuario_marca_entrada], map: "usuarioMarcaEntrada_idx")
   @@index([usuario_marca_salida], map: "usuarioMarcaSalida_idx")
-  @@index([salida_anticipada_id], map: "c_marca_dia_salida_anticipada_id_fkey")
+  @@index([empleadoFijo_id, fecha], map: "idx_marca_dia_fijo_fecha")
+  @@index([empleadoReemplaza_id, fecha], map: "idx_marca_dia_reemplaza_fecha")
 }
 
 model c_permiso_con_goce {
@@ -1442,7 +1466,6 @@ model c_salida_anticipada {
   empleado_id            Int?
   motivo                 String?            @db.LongText
   c_accion_personal      c_accion_personal?
-  c_marca_dia            c_marca_dia[]
   c_empleado             c_empleado?        @relation(fields: [empleado_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "c_salida_anticipada_empleado_id_fkey")
 
   @@index([empleado_id], map: "c_salida_anticipada_empleado_id_fkey")
@@ -1633,6 +1656,7 @@ model c_tipo_accion {
   afecta_horario             Boolean?
   c_accion_personal          c_accion_personal[]
   c_roltipoaccion_tipoaccion c_roltipoaccion_tipoaccion[]
+  log_accionpersonal         log_accionpersonal[]
 }
 
 model c_tramite_portacion_arma {
@@ -1857,6 +1881,12 @@ model e_domicilio {
   activo             Boolean?
   coordenadas_gpslat String?     @db.VarChar(255)
   coordenadas_gpslng String?     @db.VarChar(255)
+  created_at         DateTime?   @db.DateTime(0)
+  updated_at         DateTime?   @db.DateTime(0)
+  created_by         String?     @db.VarChar(64)
+  updated_by         String?     @db.VarChar(64)
+  deleted_at         DateTime?   @db.DateTime(0)
+  deleted_by         String?     @db.VarChar(64)
   c_empleado         c_empleado? @relation(fields: [empleado_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_7F866C2C952BE730")
   n_region           n_region?   @relation(fields: [region_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_7F866C2C98260155")
   n_distrito         n_distrito? @relation(fields: [distrito_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_7F866C2CE557397E")
@@ -1954,6 +1984,7 @@ model e_estructura_articulo_corpo_puesto_entrega {
   puesto_id                            Int?
   marca                                String                                 @db.VarChar(255)
   serie                                String                                 @db.VarChar(255)
+  modelo                               String?                                @db.VarChar(255)
   fechaEntrega                         DateTime                               @db.DateTime(0)
   nomencladorArticuloCP_id             Int?
   c_articulo_mantenimiento             c_articulo_mantenimiento[]
@@ -2134,7 +2165,7 @@ model e_estructura_dia_excepcion_plaza {
   hora_inicio_real                  DateTime?                          @db.Time(0)
   hora_fin_real                     DateTime?                          @db.Time(0)
   diaExcepcionPuesto_id             Int?
-  horas_duracion                    Decimal?                           @db.Decimal(10, 0)
+  horas_duracion                    Decimal?                           @db.Decimal(10, 2)
   marcaDia_id                       Int?                               @unique(map: "UNIQ_640C22F17963DFC5")
   e_estructura_dia_excepcion_puesto e_estructura_dia_excepcion_puesto? @relation(fields: [diaExcepcionPuesto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_640C22F132838645")
   c_marca_dia                       c_marca_dia?                       @relation(fields: [marcaDia_id], references: [id], onUpdate: NoAction, map: "FK_640C22F17963DFC5")
@@ -2313,6 +2344,7 @@ model e_estructura_plazas {
   empleadoPlaza_id                                                            Int?
   maestra                                                                     Boolean?
   peso                                                                        Decimal?                               @db.Decimal(10, 2)
+  es_real                                                                     Boolean                                @default(true)
   c_accion_personal                                                           c_accion_personal[]
   c_cambio_guardia_c_cambio_guardia_plazaAusente_idToe_estructura_plazas      c_cambio_guardia[]                     @relation("c_cambio_guardia_plazaAusente_idToe_estructura_plazas")
   c_cambio_guardia_c_cambio_guardia_plazaReemplaza_idToe_estructura_plazas    c_cambio_guardia[]                     @relation("c_cambio_guardia_plazaReemplaza_idToe_estructura_plazas")
@@ -2339,6 +2371,10 @@ model e_estructura_plazas {
   c_empleado_plaza_e_estructura_plazas_empleadoPlaza_idToc_empleado_plaza     c_empleado_plaza?                      @relation("e_estructura_plazas_empleadoPlaza_idToc_empleado_plaza", fields: [empleadoPlaza_id], references: [id], onUpdate: NoAction, map: "FK_92687E5066A839D6")
   c_combo_uniforme_plaza                                                      c_combo_uniforme_plaza?                @relation(fields: [comboUniforme_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_92687E50A07740F")
   pg_categoria_salarial                                                       pg_categoria_salarial?                 @relation(fields: [categoriaSalarial_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_92687E50F4C2234D")
+  log_accionpersonal                                                          log_accionpersonal[]
+  log_cambioguardia_log_cambioguardia_plazaAusente_idToe_estructura_plazas    log_cambioguardia[]                    @relation("log_cambioguardia_plazaAusente_idToe_estructura_plazas")
+  log_cambioguardia_log_cambioguardia_plazaReemplaza_idToe_estructura_plazas  log_cambioguardia[]                    @relation("log_cambioguardia_plazaReemplaza_idToe_estructura_plazas")
+  log_extra                                                                   log_extra[]
   m_puesto_no_cubierto                                                        m_puesto_no_cubierto[]
   m_refuerzo                                                                  m_refuerzo[]
   pg_planilla_empleado                                                        pg_planilla_empleado[]
@@ -2821,9 +2857,11 @@ model m_puesto_no_cubierto {
   hora_inicio           DateTime               @db.Time(0)
   hora_fin              DateTime               @db.Time(0)
   turno                 String                 @db.VarChar(1)
-  horas_duracion        Decimal?               @db.Decimal(10, 0)
+  horas_duracion        Decimal?               @db.Decimal(10, 2)
   marcaDia_id           Int?                   @unique(map: "UNIQ_61ED78837963DFC5")
   reposicionDeHoras_id  Int?
+  deleted_at            DateTime?              @db.DateTime(0)
+  deleted_by            String?                @db.VarChar(254)
   c_marca_dia           c_marca_dia?           @relation(fields: [marcaDia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_61ED78837963DFC5")
   c_empleado            c_empleado?            @relation(fields: [empleado_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_61ED7883952BE730")
   m_reposicion_de_horas m_reposicion_de_horas? @relation(fields: [reposicionDeHoras_id], references: [id], onUpdate: NoAction, map: "FK_61ED7883C49D574A")
@@ -2843,7 +2881,7 @@ model m_refuerzo {
   hora_fin                  DateTime                    @db.Time(0)
   turno                     String                      @db.VarChar(1)
   marcaDia_id               Int?                        @unique(map: "UNIQ_E14C49FC7963DFC5")
-  horas_duracion            Decimal?                    @db.Decimal(10, 0)
+  horas_duracion            Decimal?                    @db.Decimal(10, 2)
   plaza_id                  Int?
   tipo_refuerzo             String                      @db.VarChar(2)
   extra_id                  Int?                        @unique(map: "UNIQ_E14C49FC2B959FC6")
@@ -2867,8 +2905,10 @@ model m_reposicion_de_horas {
   hora_inicio          DateTime               @db.Time(0)
   hora_fin             DateTime               @db.Time(0)
   turno                String                 @db.VarChar(1)
-  horas_duracion       Decimal?               @db.Decimal(10, 0)
+  horas_duracion       Decimal?               @db.Decimal(10, 2)
   marcaDia_id          Int?                   @unique(map: "UNIQ_35E7E0D47963DFC5")
+  tipo                 String                 @db.VarChar(2)
+  c_horas_extras       c_horas_extras[]
   m_puesto_no_cubierto m_puesto_no_cubierto[]
   e_estructura_puesto  e_estructura_puesto?   @relation(fields: [puesto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_35E7E0D45035E9DA")
   c_marca_dia          c_marca_dia?           @relation(fields: [marcaDia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_35E7E0D47963DFC5")
@@ -3127,12 +3167,15 @@ model n_empresa_poliza {
   division_id          Int?
   empresa_id           Int?
   numero               String                @db.VarChar(100)
+  aseguradora_id       Int?
   c_incapacidad_ins    c_incapacidad_ins[]
   n_division           n_division?           @relation(fields: [division_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_1223BAD041859289")
   e_estructura_empresa e_estructura_empresa? @relation(fields: [empresa_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_1223BAD0521E1991")
+  n_aseguradora        n_aseguradora?        @relation(fields: [aseguradora_id], references: [id], onUpdate: NoAction, map: "FK_empresa_poliza_aseguradora")
 
   @@index([division_id], map: "IDX_1223BAD041859289")
   @@index([empresa_id], map: "IDX_1223BAD0521E1991")
+  @@index([aseguradora_id], map: "IDX_empresa_poliza_aseguradora")
 }
 
 model n_escolaridad {
@@ -3206,9 +3249,11 @@ model n_motivo_extra {
   codigo_accion_personal String           @db.VarChar(10)
   c_horas_extras         c_horas_extras[]
   c_marca_dia            c_marca_dia[]
+  log_extra              log_extra[]
   n_tipo_extra           n_tipo_extra?    @relation(fields: [tipoExtra_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_A3B0B86EB5523D4D")
 
   @@index([tipoExtra_id], map: "IDX_A3B0B86EB5523D4D")
+  @@index([codigo_accion_personal], map: "idx_codigo_accion_personal")
 }
 
 model n_motivo_hora_extra {
@@ -3826,7 +3871,7 @@ model pg_pe_dia {
   planillaEmpleado_id                                                         Int?
   hora_inicio                                                                 DateTime?             @db.Time(0)
   hora_fin                                                                    DateTime?             @db.Time(0)
-  horas_duracion                                                              Decimal?              @db.Decimal(10, 0)
+  horas_duracion                                                              Decimal?              @db.Decimal(10, 2)
   imp_rebajo                                                                  Decimal               @db.Decimal(10, 2)
   tipo_turno                                                                  String?               @db.VarChar(1)
   motivo_separacion_temp                                                      String?               @db.VarChar(5)
@@ -3837,6 +3882,7 @@ model pg_pe_dia {
   planillaEmpleadoRdh_id                                                      Int?
   num_horas_llt                                                               Decimal               @db.Decimal(10, 2)
   num_horas_sa                                                                Decimal               @db.Decimal(10, 2)
+  tipo_rdh                                                                    String?               @db.VarChar(10)
   pg_planilla_empleado_pg_pe_dia_planillaEmpleadoRdh_idTopg_planilla_empleado pg_planilla_empleado? @relation("pg_pe_dia_planillaEmpleadoRdh_idTopg_planilla_empleado", fields: [planillaEmpleadoRdh_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_11D3EF533FBAC2B")
   pg_planilla_empleado_pg_pe_dia_planillaEmpleadoCdg_idTopg_planilla_empleado pg_planilla_empleado? @relation("pg_pe_dia_planillaEmpleadoCdg_idTopg_planilla_empleado", fields: [planillaEmpleadoCdg_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_11D3EF53436B53E8")
   pg_planilla_empleado_pg_pe_dia_planillaEmpleado_idTopg_planilla_empleado    pg_planilla_empleado? @relation("pg_pe_dia_planillaEmpleado_idTopg_planilla_empleado", fields: [planillaEmpleado_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_11D3EF53799EE823")
@@ -4027,6 +4073,8 @@ model pg_planilla_empleado {
   num_refuerzos                                                                                 Decimal                         @db.Decimal(10, 2)
   num_induccion                                                                                 Decimal                         @db.Decimal(10, 2)
   info_ultima_semana                                                                            Json?
+  imp_rdh                                                                                       Decimal                         @db.Decimal(10, 2)
+  num_rdh                                                                                       Decimal                         @db.Decimal(10, 2)
   c_horas_extras                                                                                c_horas_extras[]
   pg_pe_bonif_empl_pagado                                                                       pg_pe_bonif_empl_pagado[]
   pg_pe_bonif_plaza_pagado                                                                      pg_pe_bonif_plaza_pagado[]
@@ -4405,6 +4453,7 @@ model security_fos_user {
   permiso_marcar_horario_plaza        Boolean?
   permiso_limite_extras_semanal       Boolean?
   password_expires_at                 DateTime?                             @db.DateTime(0)
+  dashboard_layout                    dashboard_layout[]
   e_estructura_cliente_usuario        e_estructura_cliente_usuario[]
   n_ejecutivo_cuenta                  n_ejecutivo_cuenta?                   @relation(fields: [ejecutivoCuenta_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_F611E3AB5CAEAC5D")
   n_coordinado_por                    n_coordinado_por?                     @relation(fields: [coordinadoPor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_F611E3AB81B56B3")
@@ -4413,6 +4462,7 @@ model security_fos_user {
   security_fos_users_groups           security_fos_users_groups[]
   security_fos_users_roles_monitoreo  security_fos_users_roles_monitoreo[]
   security_fos_users_roles_tipoaccion security_fos_users_roles_tipoaccion[]
+  user_dashboard_config               user_dashboard_config[]
 
   @@index([ejecutivoCuenta_id], map: "IDX_F611E3AB5CAEAC5D")
   @@index([coordinadoPor_id], map: "IDX_F611E3AB81B56B3")
@@ -4562,7 +4612,7 @@ model v_vacacion_solicitud {
   fecha_fin                                                DateTime?                            @db.Date
   dias                                                     Int
   semanas                                                  Int
-  observaciones                                            String?                              @db.VarChar(254)
+  observaciones                                            String?                              @db.VarChar(1000)
   monto                                                    Decimal?                             @db.Decimal(10, 2)
   consecutivo                                              String?                              @db.VarChar(15)
   estado_aprobacion                                        String?                              @db.VarChar(30)
@@ -4588,6 +4638,7 @@ model v_vacacion_solicitud {
   coordinador_id                                           Int?
   coordinadoPor_id                                         Int?
   pago_periodos_consecutivos                               Boolean?
+  consultor_log                                            consultor_log[]
   c_accion_personal                                        c_accion_personal?                   @relation(fields: [accionPersonal_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_98808EDA4558C79")
   c_empleado_v_vacacion_solicitud_sustituto_idToc_empleado c_empleado?                          @relation("v_vacacion_solicitud_sustituto_idToc_empleado", fields: [sustituto_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_98808EDA6D3EA93A")
   n_motivo_rechazo_solicitud_vacacion                      n_motivo_rechazo_solicitud_vacacion? @relation(fields: [motivoRechazo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_98808EDA7F5F4055")
@@ -4639,6 +4690,8 @@ model c_acta_entre_producto {
   firma_recibe                     String?                            @db.LongText
   firma_responsable                String                             @db.LongText
   division_id                      Int
+  puesto_id                        Int                                @default(0)
+  isActive                         Boolean                            @default(true)
   c_imagenes_acta_entrega_producto c_imagenes_acta_entrega_producto[]
 }
 
@@ -4660,6 +4713,11 @@ model c_agenda_minuta {
   created_at            DateTime              @default(now())
   created_by            String
   temas_a_tratar        String?               @db.LongText
+  empresa_id            Int                   @default(0)
+  division_id           Int                   @default(0)
+  contrato_id           Int                   @default(0)
+  isActive              Boolean               @default(true)
+  estado                Boolean               @default(false)
   e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
   e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
   e_estructura_puesto   e_estructura_puesto   @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
@@ -4701,6 +4759,9 @@ model c_apertura_cierre_puesto {
   nombre_representante_empresa_saliente String                              @db.VarChar(255)
   firma_representante_cliente           String?                             @db.LongText
   division_id                           Int
+  empresa_id                            Int                                 @default(0)
+  contrato_id                           Int                                 @default(0)
+  isActive                              Boolean                             @default(true)
   e_estructura_cliente                  e_estructura_cliente                @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
   e_estructura_sucursal                 e_estructura_sucursal               @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
   n_division                            n_division                          @relation(fields: [division_id], references: [id], onDelete: Cascade)
@@ -4810,24 +4871,33 @@ model c_bitacora_vehiculo_detenido {
   sucursal_id           Int
   uso_id                Int?
   vehiculo_id           Int?
+  division_id           Int
+  contrato_id           Int      @default(0)
+  puesto_id             Int      @default(0)
+  isActive              Boolean  @default(true)
 }
 
 model c_boleta_apreciacion_vulnerabilidad {
-  id                     Int                   @id @default(autoincrement())
-  cliente_id             Int
-  corpo_id               Int
-  puesto_id              Int
-  fecha                  DateTime              @db.DateTime(0)
-  enlace                 String                @db.VarChar(255)
-  nombre_solicitante     String                @db.VarChar(255)
-  boleta                 String                @db.LongText
-  metricas_vulnerablidad String                @db.LongText
-  observaciones          String?               @db.LongText
-  firma_solicitante      String?               @db.LongText
-  firma_responsable      String                @db.LongText
-  e_estructura_cliente   e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  e_estructura_sucursal  e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
-  e_estructura_puesto    e_estructura_puesto   @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
+  id                                           Int                                            @id @default(autoincrement())
+  cliente_id                                   Int
+  corpo_id                                     Int
+  puesto_id                                    Int
+  fecha                                        DateTime                                       @db.DateTime(0)
+  enlace                                       String                                         @db.VarChar(255)
+  nombre_solicitante                           String                                         @db.VarChar(255)
+  boleta                                       String                                         @db.LongText
+  metricas_vulnerablidad                       String                                         @db.LongText
+  observaciones                                String?                                        @db.LongText
+  firma_solicitante                            String?                                        @db.LongText
+  firma_responsable                            String                                         @db.LongText
+  empresa_id                                   Int                                            @default(0)
+  division_id                                  Int                                            @default(0)
+  contrato_id                                  Int                                            @default(0)
+  isActive                                     Boolean                                        @default(true)
+  e_estructura_cliente                         e_estructura_cliente                           @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
+  e_estructura_sucursal                        e_estructura_sucursal                          @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
+  e_estructura_puesto                          e_estructura_puesto                            @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
+  c_imagenes_boleta_apreciacion_vulnerabilidad c_imagenes_boleta_apreciacion_vulnerabilidad[]
 
   @@index([cliente_id], map: "c_boleta_apreciacion_vulnerabilidad_cliente_id_fkey")
   @@index([corpo_id], map: "c_boleta_apreciacion_vulnerabilidad_corpo_id_fkey")
@@ -4862,6 +4932,9 @@ model c_checklist_supervision {
   fecha                            DateTime                           @db.DateTime(0)
   firma_supervisor                 String?                            @db.LongText
   articulos_puesto                 String                             @db.LongText
+  empresa_id                       Int                                @default(0)
+  contrato_id                      Int                                @default(0)
+  isActive                         Boolean                            @default(true)
   e_estructura_cliente             e_estructura_cliente               @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
   e_estructura_sucursal            e_estructura_sucursal              @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
   e_estructura_puesto              e_estructura_puesto                @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
@@ -4890,20 +4963,27 @@ model c_contribucion_incidente {
 }
 
 model c_control_asistencia {
-  id                            Int                             @id @default(autoincrement())
-  empresa_id                    Int
-  contrato_id                   Int
-  corpo_id                      Int
-  turno                         String
-  total_presentes               Int
-  colaboradores                 String                          @db.LongText
-  created_at                    DateTime                        @default(now())
-  created_by                    Int
-  firma_responsable             String                          @db.LongText
-  division_id                   Int
-  cliente_id                    Int
-  fecha                         DateTime                        @db.DateTime(0)
-  c_imagenes_control_asistencia c_imagenes_control_asistencia[]
+  id                                   Int                                    @id @default(autoincrement())
+  empresa_id                           Int
+  contrato_id                          Int
+  corpo_id                             Int
+  turno                                String
+  total_presentes                      Int
+  colaboradores                        String                                 @db.LongText
+  created_at                           DateTime                               @default(now())
+  created_by                           Int
+  firma_responsable                    String                                 @db.LongText
+  division_id                          Int
+  cliente_id                           Int
+  fecha                                DateTime                               @db.DateTime(0)
+  puesto_id                            Int                                    @default(0)
+  isActive                             Boolean                                @default(true)
+  total_empleados_turno                Int                                    @default(0)
+  nombre_supervisor                    String?                                @db.LongText
+  firma_manual_supervisor              String?                                @db.LongText
+  comentarios                          String?                                @db.LongText
+  c_control_asistencia_empleado_firmas c_control_asistencia_empleado_firmas[]
+  c_imagenes_control_asistencia        c_imagenes_control_asistencia[]
 }
 
 model c_empleado_almuerzo {
@@ -4917,6 +4997,14 @@ model c_empleado_almuerzo {
   empleado_nombre  String     @db.LongText
   firma_empleado   String     @db.LongText
   minutos_almuerzo Float
+  empresa_id       Int        @default(0)
+  cliente_id       Int        @default(0)
+  division_id      Int        @default(0)
+  contrato_id      Int        @default(0)
+  corpo_id         Int        @default(0)
+  puesto_id        Int        @default(0)
+  isActive         Boolean    @default(true)
+  marca_id         Int
   c_empleado       c_empleado @relation(fields: [empleadoId], references: [id], onDelete: Cascade)
 
   @@index([empleadoId], map: "empleadoId_almuerzo_fkey")
@@ -4955,6 +5043,8 @@ model c_encuesta_cliente {
   telefono_evaluado     String                @db.VarChar(25)
   empresa_evaluado      String                @db.VarChar(55)
   observaciones         String                @db.LongText
+  contrato_id           Int                   @default(0)
+  isActive              Boolean               @default(true)
   e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: NoAction)
   e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: NoAction)
   n_division            n_division            @relation(fields: [division_id], references: [id], onDelete: NoAction)
@@ -4989,6 +5079,11 @@ model c_evaluacion_empleado {
   firma_empleado        String?               @db.LongText
   created_at            DateTime              @db.DateTime(0)
   firma_empleado_manual String?               @db.LongText
+  empresa_id            Int                   @default(0)
+  cliente_id            Int                   @default(0)
+  division_id           Int                   @default(0)
+  contrato_id           Int                   @default(0)
+  isActive              Boolean               @default(false)
   e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: NoAction)
   e_estructura_plazas   e_estructura_plazas   @relation(fields: [plaza_id], references: [id], onDelete: NoAction)
   e_estructura_puesto   e_estructura_puesto   @relation(fields: [puesto_id], references: [id], onDelete: NoAction)
@@ -5054,11 +5149,15 @@ model c_incidente {
   costo_asociado              String?                    @db.LongText
   consecutivo_informe         String?                    @db.LongText
   link_informe                String?                    @db.LongText
-  cliente_id                  Int
-  empresa_id                  Int
+  cliente_id                  Int                        @default(0)
+  empresa_id                  Int                        @default(0)
   estado                      Boolean
   created_at                  DateTime                   @db.DateTime(0)
   created_by                  Int
+  division_id                 Int                        @default(0)
+  contrato_id                 Int                        @default(0)
+  puesto_id                   Int                        @default(0)
+  isActive                    Boolean                    @default(false)
   c_archivos_incidente        c_archivos_incidente[]
   c_contribucion_incidente    c_contribucion_incidente[]
   n_clasificacion_incidente   n_clasificacion_incidente  @relation(fields: [clasificacion], references: [id], onDelete: NoAction)
@@ -5088,7 +5187,7 @@ model c_maestro_quejas {
   empresa_presenta_queja       String
   persona_presenta_queja       String
   medio_recepcion_queja        String
-  tipo_queja                   String
+  tipo_cliente                 String
   ubicacion                    String
   nivel_queja                  String
   fecha_queja                  String
@@ -5102,6 +5201,10 @@ model c_maestro_quejas {
   created_at                   DateTime          @default(now())
   created_by                   String
   firma_responsable            String            @db.LongText
+  division_id                  Int               @default(0)
+  isActive                     Boolean           @default(false)
+  estimacion_dannio            String?           @db.LongText
+  tipo_queja                   String?           @db.LongText
   c_anexos_quejas              c_anexos_quejas[]
 }
 
@@ -5160,6 +5263,9 @@ model c_notas_voz {
   firma_responsable     String                @db.LongText
   created_by            Int
   created_at            DateTime              @db.DateTime(0)
+  division_id           Int                   @default(0)
+  contrato_id           Int                   @default(0)
+  isActive              Boolean               @default(true)
   e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: NoAction)
   e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: NoAction)
   e_estructura_empresa  e_estructura_empresa  @relation(fields: [empresa_id], references: [id], onDelete: NoAction)
@@ -5208,6 +5314,11 @@ model c_producto_no_conforme {
   firma_persona_identifico_pnc    String?                           @db.LongText
   firma_persona_origino_pnc       String?                           @db.LongText
   firma_responsable               String                            @db.LongText
+  empresa_id                      Int
+  division_id                     Int
+  contrato_id                     Int
+  puesto_id                       Int
+  isActive                        Boolean                           @default(true)
   e_estructura_cliente            e_estructura_cliente              @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
   e_estructura_sucursal           e_estructura_sucursal             @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
   e_archivos_producto_no_conforme e_archivos_producto_no_conforme[]
@@ -5228,6 +5339,12 @@ model c_puesto_notas {
   firma_manual_responsable String?                   @db.LongText
   firma_responsable        String                    @db.LongText
   is_modified              Boolean                   @default(false)
+  empresa_id               Int
+  cliente_id               Int                       @default(0)
+  division_id              Int                       @default(0)
+  contrato_id              Int                       @default(0)
+  corpo_id                 Int                       @default(0)
+  isActive                 Boolean                   @default(true)
   c_imagenes_puesto_notas  c_imagenes_puesto_notas[]
   e_estructura_puesto      e_estructura_puesto       @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
 
@@ -5247,6 +5364,10 @@ model c_registro_induccion_general {
   firma_responsable                     String                                  @db.LongText
   created_at                            DateTime                                @default(now())
   created_by                            String
+  division_id                           Int                                     @default(0)
+  contrato_id                           Int                                     @default(0)
+  puesto_id                             Int                                     @default(0)
+  isActive                              Boolean                                 @default(true)
   c_imagenes_registro_induccion_general c_imagenes_registro_induccion_general[]
   e_estructura_cliente                  e_estructura_cliente                    @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
   e_estructura_sucursal                 e_estructura_sucursal                   @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
@@ -5261,9 +5382,9 @@ model c_registro_induccion_recorrido {
   id                     Int      @id @default(autoincrement())
   empresa_id             Int
   cliente_id             Int
-  contrato_id            Int
+  contrato_id            Int      @default(0)
   corpo_id               Int
-  puesto_id              Int
+  puesto_id              Int      @default(0)
   plaza_id               Int
   fecha                  DateTime @default(now())
   renglon_edificio       String
@@ -5279,13 +5400,15 @@ model c_registro_induccion_recorrido {
   firma_responsable      String   @db.LongText
   empleado_id            Int
   firma_empleado         String?  @db.LongText
+  isActive               Boolean  @default(true)
+  division_id            Int      @default(0)
 }
 
 model c_solicitud_permiso {
   id                             Int                            @id @default(autoincrement())
   created_at                     DateTime                       @default(now())
   created_by                     Int
-  comentarios                    String?                        @db.LongText
+  observaciones                  String?                        @db.LongText
   ejecutivo_cuenta               Int
   empleado_id                    Int
   fecha_fin                      DateTime                       @db.DateTime(0)
@@ -5298,6 +5421,16 @@ model c_solicitud_permiso {
   tipo                           String                         @db.VarChar(15)
   plaza_id                       Int
   accionPersonal_id              Int?
+  estado                         String                         @default("pendiente") @db.VarChar(15)
+  empresa_id                     Int                            @default(0)
+  cliente_id                     Int                            @default(0)
+  division_id                    Int                            @default(0)
+  contrato_id                    Int                            @default(0)
+  corpo_id                       Int                            @default(0)
+  puesto_id                      Int                            @default(0)
+  isActive                       Boolean                        @default(true)
+  motivo                         String                         @db.LongText
+  firma_empleado_manual          String                         @db.LongText
   c_archivos_solicitud_permiso   c_archivos_solicitud_permiso[]
   c_empleado                     c_empleado                     @relation(fields: [empleado_id], references: [id], onDelete: Cascade)
 
@@ -5329,22 +5462,27 @@ model c_vehiculos_corporativos {
   id                                     Int                                      @id @default(autoincrement())
   cliente_id                             Int
   sucursal_id                            Int
-  placa                                  String                                   @db.VarChar(52)
+  placa                                  String?                                  @db.VarChar(52)
   tipo                                   String                                   @db.VarChar(52)
-  kilometraje                            Int
-  prox_cambio_aceite                     Int
-  modelo                                 String                                   @db.VarChar(52)
-  anno                                   Int
-  descripcion                            String                                   @db.LongText
-  titulo_propiedad                       Boolean                                  @default(true)
-  rtv                                    Boolean                                  @default(true)
-  marchamo                               Boolean                                  @default(true)
+  kilometraje                            Int?
+  prox_cambio_aceite                     Int?
+  modelo                                 String?                                  @db.VarChar(52)
+  anno                                   Int?
+  descripcion                            String?                                  @db.LongText
+  titulo_propiedad                       Boolean?
+  rtv                                    Boolean?
+  marchamo                               Boolean?
   firma_responsable                      String                                   @db.LongText
   created_by                             Int
   created_at                             DateTime                                 @db.DateTime(0)
   estado                                 String                                   @db.VarChar(25)
-  empresa_id                             Int
+  empresa_id                             Int                                      @default(0)
   tipo_autoria                           String                                   @db.VarChar(52)
+  division_id                            Int                                      @default(0)
+  contrato_id                            Int                                      @default(0)
+  puesto_id                              Int                                      @default(0)
+  isActive                               Boolean                                  @default(true)
+  marca                                  String                                   @db.VarChar(52)
   c_imagenes_vehiculos_corporativos      c_imagenes_vehiculos_corporativos[]
   c_mantenimiento_vehiculos_corporativos c_mantenimiento_vehiculos_corporativos[]
   c_usos_vehiculos_corporativos          c_usos_vehiculos_corporativos[]
@@ -5427,6 +5565,11 @@ model e_control_documento_entregado_cliente {
   descripcion                 String                @db.LongText
   firma_representante_cliente String?               @db.LongText
   firma_responsable           String                @db.LongText
+  empresa_id                  Int                   @default(0)
+  contrato_id                 Int                   @default(0)
+  puesto_id                   Int                   @default(0)
+  isActive                    Boolean               @default(true)
+  division_id                 Int                   @default(0)
   e_estructura_cliente        e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
   e_estructura_sucursal       e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
 
@@ -5475,6 +5618,11 @@ model e_llave {
   firma_responsable     String                @db.LongText
   created_by            Int
   created_at            DateTime              @db.DateTime(0)
+  empresa_id            Int                   @default(0)
+  division_id           Int                   @default(0)
+  isActive              Boolean               @default(false)
+  contrato_id           Int                   @default(0)
+  numero_llave          String                @default("0") @db.VarChar(50)
   e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
   e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
   e_estructura_puesto   e_estructura_puesto   @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
@@ -5507,6 +5655,11 @@ model e_llavero {
   created_by            Int
   created_at            DateTime               @db.DateTime(0)
   nombre_llavero        String                 @db.VarChar(50)
+  empresa_id            Int                    @default(0)
+  division_id           Int                    @default(0)
+  contrato_id           Int                    @default(0)
+  isActive              Boolean                @default(false)
+  numero_llavero        String                 @default("0") @db.VarChar(50)
   e_llave_en_llavero    e_llave_en_llavero[]
   e_estructura_cliente  e_estructura_cliente   @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
   e_estructura_sucursal e_estructura_sucursal  @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
@@ -5527,6 +5680,12 @@ model e_manual_puesto {
   created_by                             String
   created_at                             DateTime                                 @db.DateTime(0)
   quiz                                   String?                                  @db.LongText
+  empresa_id                             Int
+  cliente_id                             Int
+  division_id                            Int
+  contrato_id                            Int
+  corpo_id                               Int
+  isActive                               Boolean                                  @default(false)
   e_archivos_manual_puesto               e_archivos_manual_puesto[]
   e_empleado_visualizacion_manual_puesto e_empleado_visualizacion_manual_puesto[]
   e_puestos_manual_puesto                e_puestos_manual_puesto[]
@@ -5568,8 +5727,8 @@ model e_movimiento_llavero {
 
 model e_mutuos_acuerdos {
   id                             Int                   @id @default(autoincrement())
-  cliente_id                     Int
-  corpo_id                       Int
+  cliente_id                     Int                   @default(0)
+  corpo_id                       Int                   @default(0)
   ejecutivo_cuenta               Int
   motivo                         String                @db.LongText
   firma_responsable              String                @db.LongText
@@ -5589,6 +5748,14 @@ model e_mutuos_acuerdos {
   ausente_acepta_at              DateTime?             @db.DateTime(0)
   reemplaza_acepta_at            DateTime?             @db.DateTime(0)
   file_name                      String?               @db.VarChar(255)
+  estado                         String                @default("pendiente") @db.VarChar(15)
+  empresa_id                     Int                   @default(0)
+  division_id                    Int                   @default(0)
+  contrato_id                    Int                   @default(0)
+  puesto_id                      Int                   @default(0)
+  isActive                       Boolean               @default(true)
+  firma_ausente_manual           String?               @db.LongText
+  firma_reemplaza_manual         String?               @db.LongText
   e_estructura_cliente           e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: NoAction)
   e_estructura_sucursal          e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: NoAction)
   n_ejecutivo_cuenta             n_ejecutivo_cuenta    @relation(fields: [ejecutivo_cuenta], references: [id], onDelete: NoAction)
@@ -5610,26 +5777,31 @@ model e_puestos_manual_puesto {
 }
 
 model e_registro_capacitaciones {
-  id                      Int                       @id @default(autoincrement())
-  empresa_id              Int
-  cliente_id              Int
-  corpo_id                Int
-  titulo                  String                    @db.LongText
-  descripcion             String                    @db.LongText
-  resultado               String?                   @db.VarChar(15)
-  observaciones           String                    @db.LongText
-  nombre_responsable      String                    @db.LongText
-  firma_responsable       String                    @db.LongText
-  cedula_responsable      String                    @db.VarChar(25)
-  responsable_id          Int
-  fecha                   DateTime                  @db.Date
-  file                    String?                   @db.LongText
-  tipo                    String                    @db.VarChar(15)
-  e_capacitacion_empleado e_capacitacion_empleado[]
-  e_capacitacion_puesto   e_capacitacion_puesto[]
-  e_estructura_cliente    e_estructura_cliente      @relation(fields: [cliente_id], references: [id], onDelete: NoAction)
-  e_estructura_sucursal   e_estructura_sucursal     @relation(fields: [corpo_id], references: [id], onDelete: NoAction)
-  e_estructura_empresa    e_estructura_empresa      @relation(fields: [empresa_id], references: [id], onDelete: NoAction)
+  id                                 Int                                  @id @default(autoincrement())
+  empresa_id                         Int
+  cliente_id                         Int
+  corpo_id                           Int
+  titulo                             String                               @db.LongText
+  descripcion                        String                               @db.LongText
+  resultado                          String?                              @db.VarChar(15)
+  observaciones                      String                               @db.LongText
+  nombre_responsable                 String                               @db.LongText
+  firma_responsable                  String                               @db.LongText
+  cedula_responsable                 String                               @db.VarChar(25)
+  responsable_id                     Int
+  fecha                              DateTime                             @db.Date
+  file                               String?                              @db.LongText
+  tipo                               String                               @db.VarChar(15)
+  division_id                        Int                                  @default(0)
+  contrato_id                        Int                                  @default(0)
+  puesto_id                          Int                                  @default(0)
+  isActive                           Boolean                              @default(true)
+  c_archivos_adjuntos_capacitaciones c_archivos_adjuntos_capacitaciones[]
+  e_capacitacion_empleado            e_capacitacion_empleado[]
+  e_capacitacion_puesto              e_capacitacion_puesto[]
+  e_estructura_cliente               e_estructura_cliente                 @relation(fields: [cliente_id], references: [id], onDelete: NoAction)
+  e_estructura_sucursal              e_estructura_sucursal                @relation(fields: [corpo_id], references: [id], onDelete: NoAction)
+  e_estructura_empresa               e_estructura_empresa                 @relation(fields: [empresa_id], references: [id], onDelete: NoAction)
 
   @@index([cliente_id], map: "e_registro_capacitaciones_cliente_id_fkey")
   @@index([corpo_id], map: "e_registro_capacitaciones_corpo_id_fkey")
@@ -5641,18 +5813,20 @@ model e_registro_entrega_puesto {
   cliente_id            Int
   corpo_id              Int
   puesto_id             Int
-  oficial_entrega       String                @db.VarChar(255)
-  fecha_entrada_entrega DateTime              @db.Date
-  fecha_salida_entrega  DateTime              @db.Date
-  hora_entrada_entrega  DateTime              @db.Time(0)
-  hora_salida_entrega   DateTime              @db.Time(0)
-  turno_entrega         String                @db.VarChar(55)
+  oficial_entrega       String?               @db.VarChar(255)
+  fecha_entrada_entrega DateTime?             @db.Date
+  fecha_salida_entrega  DateTime?             @db.Date
+  hora_entrada_entrega  DateTime?             @db.Time(0)
+  hora_salida_entrega   DateTime?             @db.Time(0)
+  turno_entrega         String?               @db.VarChar(55)
+  marca_entrega_id      Int?
   oficial_recibe        String                @db.VarChar(255)
   fecha_entrada_recibe  DateTime              @db.Date
   fecha_salida_recibe   DateTime              @db.Date
   hora_entrada_recibe   DateTime              @db.Time(0)
   hora_salida_recibe    DateTime              @db.Time(0)
   turno_recibe          String                @db.VarChar(55)
+  marca_recibe_id       Int?
   articulos_puesto      String                @db.LongText
   observaciones         String                @db.LongText
   firma_responsable     String                @db.LongText
@@ -5688,6 +5862,11 @@ model e_registro_personas {
   foto_cedula           String?               @db.LongText
   pers_autoriza_salida  String?               @db.VarChar(255)
   dep_pers_visita       String?               @db.VarChar(75)
+  empresa_id            Int
+  division_id           Int
+  contrato_id           Int
+  isActive              Boolean               @default(true)
+  firma_visitante       String?               @db.LongText
   e_activo_visitante    e_activo_visitante[]
   c_empleado            c_empleado            @relation(fields: [responsable_id], references: [id], onDelete: Cascade, map: "FK_BB503B25992BE730")
   e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: Cascade, map: "FK_BB603B25953BE730")
@@ -5718,6 +5897,10 @@ model e_registro_vehiculos {
   file_name             String?               @db.LongText
   departamento_visita   String?               @db.VarChar(255)
   persona_visita        String?               @db.VarChar(255)
+  empresa_id            Int                   @default(0)
+  division_id           Int                   @default(0)
+  contrato_id           Int                   @default(0)
+  isActive              Boolean               @default(true)
   c_empleado            c_empleado            @relation(fields: [responsable_id], references: [id], onDelete: Cascade, map: "FK_BB503B25952BE730")
   e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: Cascade, map: "FK_BB503B25953BE730")
   e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: Cascade, map: "FK_BB503B25954BE730")
@@ -5768,6 +5951,7 @@ model refresh_token {
   revoked    Boolean    @default(false)
   empleadoId Int
   sessionId  String     @db.VarChar(36)
+  device     String?    @db.LongText
   c_empleado c_empleado @relation(fields: [empleadoId], references: [id], onDelete: Cascade)
 
   @@index([empleadoId])
@@ -5858,4 +6042,415 @@ model c_archivos_solicitud_permiso {
   c_solicitud_permiso c_solicitud_permiso @relation(fields: [solicitud_id], references: [id], onDelete: Cascade)
 
   @@index([solicitud_id], map: "e_archivos_solicitud_permiso_id_fkey")
+}
+
+model c_bitacora_acciones_empleado {
+  id                     Int         @id @default(autoincrement())
+  empleado_id            Int?
+  tipo_accion_empleado   String      @db.VarChar(30)
+  tipo_accion_base_datos String      @db.VarChar(10)
+  fecha_hora             DateTime    @db.DateTime(0)
+  id_foraneo             Int
+  usuario                String?     @db.VarChar(64)
+  cambios                String?     @db.LongText
+  c_empleado             c_empleado? @relation(fields: [empleado_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_64BAB09A952BE730")
+
+  @@index([empleado_id], map: "IDX_64BAB09A952BE730")
+  @@index([fecha_hora], map: "fechaHora_idx")
+  @@index([tipo_accion_base_datos], map: "tipoAccionBaseDatos_idx")
+  @@index([tipo_accion_empleado], map: "tipoAccionEmpleado_idx")
+  @@index([usuario], map: "usuario_idx")
+}
+
+model consultor_log {
+  id                   Int                   @id @default(autoincrement())
+  empleado_id          Int?
+  solicitud_id         Int?
+  fecha                DateTime              @db.DateTime(0)
+  tipo_accion          String?               @db.VarChar(32)
+  v_vacacion_solicitud v_vacacion_solicitud? @relation(fields: [solicitud_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_45A0E79B1CB9D6E4")
+  c_empleado           c_empleado?           @relation(fields: [empleado_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_45A0E79B952BE730")
+
+  @@index([solicitud_id], map: "IDX_45A0E79B1CB9D6E4")
+  @@index([empleado_id], map: "IDX_45A0E79B952BE730")
+}
+
+model e_estructura_bitacora_acciones {
+  id                     Int      @id @default(autoincrement())
+  codigo_nombre          String   @db.VarChar(128)
+  nombre_tabla           String   @db.VarChar(64)
+  tipo_accion_base_datos String   @db.VarChar(10)
+  fecha_hora             DateTime @db.DateTime(0)
+  id_foraneo             Int
+  usuario                String?  @db.VarChar(64)
+  cambios                String?  @db.LongText
+
+  @@index([codigo_nombre], map: "codigo_nombre_idx")
+  @@index([fecha_hora], map: "fechaHora_idx")
+  @@index([nombre_tabla], map: "nombre_tabla_idx")
+  @@index([tipo_accion_base_datos], map: "tipoAccionBaseDatos_idx")
+  @@index([usuario], map: "usuario_idx")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model ext_log_entries {
+  id           Int      @id @default(autoincrement())
+  action       String   @db.VarChar(8)
+  logged_at    DateTime @db.DateTime(0)
+  object_id    String?  @db.VarChar(64)
+  object_class String   @db.VarChar(255)
+  version      Int
+  data         String?  @db.LongText
+  username     String?  @db.VarChar(255)
+
+  @@index([object_class], map: "log_class_lookup_idx")
+  @@index([logged_at], map: "log_date_lookup_idx")
+  @@index([username], map: "log_user_lookup_idx")
+  @@index([object_id, object_class, version], map: "log_version_lookup_idx")
+}
+
+model log_accionpersonal {
+  id                     Int                  @id @default(autoincrement())
+  empleado_id            Int?
+  plaza_id               Int?
+  consecutivo            String?              @db.VarChar(15)
+  unique_request_id      String?              @db.VarChar(6)
+  tipo_accion_base_datos String               @db.VarChar(10)
+  fecha_hora             DateTime             @db.DateTime(0)
+  id_foraneo             Int
+  usuario                String?              @db.VarChar(64)
+  cambios                String?              @db.LongText
+  accionPersonal_id      Int?
+  tipoAccion_id          Int?
+  c_accion_personal      c_accion_personal?   @relation(fields: [accionPersonal_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_C1BC313D4558C79")
+  c_tipo_accion          c_tipo_accion?       @relation(fields: [tipoAccion_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_C1BC313D45BFCF7F")
+  c_empleado             c_empleado?          @relation(fields: [empleado_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_C1BC313D952BE730")
+  e_estructura_plazas    e_estructura_plazas? @relation(fields: [plaza_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_C1BC313DEF34C0BD")
+
+  @@index([accionPersonal_id], map: "IDX_C1BC313D4558C79")
+  @@index([tipoAccion_id], map: "IDX_C1BC313D45BFCF7F")
+  @@index([empleado_id], map: "IDX_C1BC313D952BE730")
+  @@index([plaza_id], map: "IDX_C1BC313DEF34C0BD")
+  @@index([consecutivo], map: "consecutivo_idx")
+  @@index([fecha_hora], map: "fechaHora_idx")
+  @@index([tipo_accion_base_datos], map: "tipoAccionBaseDatos_idx")
+  @@index([usuario], map: "usuario_idx")
+}
+
+model log_accionpersonal_enlazada {
+  id                     Int                @id @default(autoincrement())
+  object_class           String?            @db.VarChar(255)
+  unique_request_id      String?            @db.VarChar(6)
+  tipo_accion_base_datos String             @db.VarChar(10)
+  fecha_hora             DateTime           @db.DateTime(0)
+  id_foraneo             Int
+  usuario                String?            @db.VarChar(64)
+  cambios                String?            @db.LongText
+  accionPersonal_id      Int?
+  c_accion_personal      c_accion_personal? @relation(fields: [accionPersonal_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ECF10934558C79")
+
+  @@index([accionPersonal_id], map: "IDX_ECF10934558C79")
+  @@index([fecha_hora], map: "fechaHora_idx")
+  @@index([tipo_accion_base_datos], map: "tipoAccionBaseDatos_idx")
+  @@index([usuario], map: "usuario_idx")
+}
+
+model log_cambioguardia {
+  id                                                                           Int                  @id @default(autoincrement())
+  consecutivo                                                                  String?              @db.VarChar(15)
+  tipo                                                                         String               @db.VarChar(5)
+  tipo_accion_base_datos                                                       String               @db.VarChar(10)
+  fecha_hora                                                                   DateTime             @db.DateTime(0)
+  id_foraneo                                                                   Int
+  usuario                                                                      String?              @db.VarChar(64)
+  cambios                                                                      String?              @db.LongText
+  cambioGuardia_id                                                             Int?
+  empleadoReemplaza_id                                                         Int?
+  plazaReemplaza_id                                                            Int?
+  empleadoAusente_id                                                           Int?
+  plazaAusente_id                                                              Int?
+  e_estructura_plazas_log_cambioguardia_plazaAusente_idToe_estructura_plazas   e_estructura_plazas? @relation("log_cambioguardia_plazaAusente_idToe_estructura_plazas", fields: [plazaAusente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3640378F60ACC8FA")
+  c_empleado_log_cambioguardia_empleadoAusente_idToc_empleado                  c_empleado?          @relation("log_cambioguardia_empleadoAusente_idToc_empleado", fields: [empleadoAusente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3640378F75F636ED")
+  c_cambio_guardia                                                             c_cambio_guardia?    @relation(fields: [cambioGuardia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3640378F9891677B")
+  c_empleado_log_cambioguardia_empleadoReemplaza_idToc_empleado                c_empleado?          @relation("log_cambioguardia_empleadoReemplaza_idToc_empleado", fields: [empleadoReemplaza_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3640378F9D7193A2")
+  e_estructura_plazas_log_cambioguardia_plazaReemplaza_idToe_estructura_plazas e_estructura_plazas? @relation("log_cambioguardia_plazaReemplaza_idToe_estructura_plazas", fields: [plazaReemplaza_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_3640378FC2F7DD75")
+
+  @@index([plazaAusente_id], map: "IDX_3640378F60ACC8FA")
+  @@index([empleadoAusente_id], map: "IDX_3640378F75F636ED")
+  @@index([cambioGuardia_id], map: "IDX_3640378F9891677B")
+  @@index([empleadoReemplaza_id], map: "IDX_3640378F9D7193A2")
+  @@index([plazaReemplaza_id], map: "IDX_3640378FC2F7DD75")
+  @@index([consecutivo], map: "consecutivo_idx")
+  @@index([fecha_hora], map: "fechaHora_idx")
+  @@index([tipo_accion_base_datos], map: "tipoAccionBaseDatos_idx")
+  @@index([tipo], map: "tipo_idx")
+  @@index([usuario], map: "usuario_idx")
+}
+
+model log_extra {
+  id                     Int                  @id @default(autoincrement())
+  extra_id               Int?
+  motivo_id              Int?
+  empleado_id            Int?
+  plaza_id               Int?
+  consecutivo            String?              @db.VarChar(15)
+  tipo_accion_base_datos String               @db.VarChar(10)
+  fecha_hora             DateTime             @db.DateTime(0)
+  id_foraneo             Int
+  usuario                String?              @db.VarChar(64)
+  cambios                String?              @db.LongText
+  c_horas_extras         c_horas_extras?      @relation(fields: [extra_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_6D41E6382B959FC6")
+  c_empleado             c_empleado?          @relation(fields: [empleado_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_6D41E638952BE730")
+  e_estructura_plazas    e_estructura_plazas? @relation(fields: [plaza_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_6D41E638EF34C0BD")
+  n_motivo_extra         n_motivo_extra?      @relation(fields: [motivo_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_6D41E638F9E584F8")
+
+  @@index([extra_id], map: "IDX_6D41E6382B959FC6")
+  @@index([empleado_id], map: "IDX_6D41E638952BE730")
+  @@index([plaza_id], map: "IDX_6D41E638EF34C0BD")
+  @@index([motivo_id], map: "IDX_6D41E638F9E584F8")
+  @@index([consecutivo], map: "consecutivo_idx")
+  @@index([fecha_hora], map: "fechaHora_idx")
+  @@index([tipo_accion_base_datos], map: "tipoAccionBaseDatos_idx")
+  @@index([usuario], map: "usuario_idx")
+}
+
+model log_generico {
+  id                     Int      @id @default(autoincrement())
+  class                  String   @db.VarChar(255)
+  tipo_accion_base_datos String   @db.VarChar(10)
+  fecha_hora             DateTime @db.DateTime(0)
+  id_foraneo             Int
+  usuario                String?  @db.VarChar(64)
+  cambios                String?  @db.LongText
+
+  @@index([class], map: "class")
+  @@index([fecha_hora], map: "fechaHora_idx")
+  @@index([tipo_accion_base_datos], map: "tipoAccionBaseDatos_idx")
+  @@index([usuario], map: "usuario_idx")
+}
+
+model log_horario {
+  id                     Int        @id @default(autoincrement())
+  horario_id             Int?
+  titulo                 String     @db.VarChar(255)
+  unique_request_id      String?    @db.VarChar(6)
+  tipo_accion_base_datos String     @db.VarChar(10)
+  fecha_hora             DateTime   @db.DateTime(0)
+  id_foraneo             Int
+  usuario                String?    @db.VarChar(64)
+  cambios                String?    @db.LongText
+  c_horario              c_horario? @relation(fields: [horario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_DA956B344959F1BA")
+
+  @@index([horario_id], map: "IDX_DA956B344959F1BA")
+  @@index([fecha_hora], map: "fechaHora_idx")
+  @@index([tipo_accion_base_datos], map: "tipoAccionBaseDatos_idx")
+  @@index([titulo], map: "titulo_idx")
+  @@index([usuario], map: "usuario_idx")
+}
+
+model log_horario_dia {
+  id                     Int            @id @default(autoincrement())
+  horario_id             Int?
+  unique_request_id      String?        @db.VarChar(6)
+  tipo_accion_base_datos String         @db.VarChar(10)
+  fecha_hora             DateTime       @db.DateTime(0)
+  id_foraneo             Int
+  usuario                String?        @db.VarChar(64)
+  cambios                String?        @db.LongText
+  horarioDia_id          Int?
+  c_horario              c_horario?     @relation(fields: [horario_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_22852C964959F1BA")
+  c_horario_dia          c_horario_dia? @relation(fields: [horarioDia_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_22852C96EF578579")
+
+  @@index([horario_id], map: "IDX_22852C964959F1BA")
+  @@index([horarioDia_id], map: "IDX_22852C96EF578579")
+  @@index([fecha_hora], map: "fechaHora_idx")
+  @@index([tipo_accion_base_datos], map: "tipoAccionBaseDatos_idx")
+  @@index([usuario], map: "usuario_idx")
+}
+
+model n_aseguradora {
+  id                Int                 @id @default(autoincrement())
+  nombre            String              @unique(map: "UNIQ_nombre") @db.VarChar(150)
+  activo            Boolean             @default(true)
+  c_incapacidad_ins c_incapacidad_ins[]
+  n_empresa_poliza  n_empresa_poliza[]
+}
+
+model c_archivos_adjuntos_capacitaciones {
+  id                        Int                       @id @default(autoincrement())
+  name                      String                    @db.LongText
+  original_name             String                    @db.LongText
+  type                      String                    @db.VarChar(25)
+  extension                 String                    @db.VarChar(25)
+  capacitacion_id           Int
+  e_registro_capacitaciones e_registro_capacitaciones @relation(fields: [capacitacion_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_capacitaciones")
+
+  @@index([capacitacion_id], map: "c_archivos_adjuntos_capacitaciones_fkey")
+}
+
+model c_imagenes_boleta_apreciacion_vulnerabilidad {
+  id                                  Int                                 @id @default(autoincrement())
+  name                                String                              @db.LongText
+  boleta_id                           Int
+  original_name                       String                              @db.LongText
+  c_boleta_apreciacion_vulnerabilidad c_boleta_apreciacion_vulnerabilidad @relation(fields: [boleta_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_boleta_apreciacion_vulnerabilidad")
+
+  @@index([boleta_id], map: "c_imagenes_boleta_apreciacion_vulnerabilidad_id_fkey")
+}
+
+model e_reportes_mobile {
+  id                Int       @id @default(autoincrement())
+  nombre            String    @db.LongText
+  numero            String    @db.VarChar(100)
+  nomenclatura      String    @db.VarChar(100)
+  descripcion       String?   @db.LongText
+  modulo            String    @db.VarChar(100)
+  tipo_reporte      String    @db.VarChar(15)
+  created_by        Int
+  estado            String    @db.VarChar(15)
+  filters           String    @db.LongText
+  order_by          String    @db.LongText
+  firma_responsable String    @db.LongText
+  created_at        DateTime  @default(now()) @db.DateTime(0)
+  attemps           Int?
+  max_attempts      Int?
+  started_at        DateTime? @db.DateTime(0)
+  finished_at       DateTime? @db.DateTime(0)
+  locked_at         DateTime? @db.DateTime(0)
+  locked_by         String?   @db.VarChar(55)
+  error_message     String?   @db.LongText
+  progress          Int?
+}
+
+model n_tipo_entrega {
+  id     Int    @id @default(autoincrement())
+  nombre String @db.LongText
+}
+
+model c_control_asistencia_empleado_firmas {
+  id                   Int                  @id @default(autoincrement())
+  control_id           Int
+  empleado_id          Int
+  firma                String               @db.LongText
+  c_control_asistencia c_control_asistencia @relation(fields: [control_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_control_asistencia")
+
+  @@index([control_id], map: "idx_control_id")
+  @@index([empleado_id], map: "idx_empleado_id")
+}
+
+model n_tipo_cliente_quejas {
+  id     Int    @id @default(autoincrement())
+  nombre String @db.LongText
+}
+
+model n_tipo_quejas {
+  id     Int    @id @default(autoincrement())
+  nombre String @db.LongText
+}
+
+model c_ubicacion_puesto_registro_cambios {
+  id                Int      @id @default(autoincrement())
+  puesto_id         Int
+  latitud_anterior  String?  @db.VarChar(255)
+  longitud_anterior String?  @db.VarChar(255)
+  latitud_nueva     String?  @db.VarChar(255)
+  longitud_nueva    String?  @db.VarChar(255)
+  created_at        DateTime @db.DateTime(0)
+  created_by        Int
+}
+
+model c_login_marca_almuerzo {
+  id                    Int       @id @default(autoincrement())
+  nombre_empleado       String    @db.VarChar(255)
+  cedula_empleado       String    @db.VarChar(25)
+  fecha_hora            DateTime  @db.DateTime(0)
+  device                String    @db.LongText
+  lat                   String?   @db.VarChar(255)
+  lng                   String?   @db.VarChar(255)
+  puesto_id             Int?
+  marca_id              Int?
+  marca_entrada_teorica DateTime? @db.DateTime(0)
+  marca_entrada_real    DateTime? @db.DateTime(0)
+  marca_salida_teorica  DateTime? @db.DateTime(0)
+  marca_salida_real     DateTime? @db.DateTime(0)
+  hora_inicio_almuerzo  DateTime? @db.DateTime(0)
+  hora_fin_almuerzo     DateTime? @db.DateTime(0)
+  session_id            String    @db.VarChar(255)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model dash_board_visualisation {
+  id                    Int                     @id @default(autoincrement())
+  chart_family          String?                 @db.VarChar(255)
+  chartType             String                  @db.VarChar(50)
+  unique_name           String?                 @unique(map: "UNIQ_60893DA798AB450A") @db.VarChar(50)
+  data_adapter          String?                 @db.VarChar(255)
+  query                 String                  @db.LongText
+  title                 String                  @db.VarChar(255)
+  description           String?                 @db.LongText
+  createdAt             DateTime                @db.DateTime(0)
+  updatedAt             DateTime?               @db.DateTime(0)
+  active                Boolean
+  is_default            Boolean
+  filterCriteria        Json?
+  chart_cfg             Json?
+  user_dashboard_config user_dashboard_config[]
+}
+
+model dashboard_layout {
+  id                    Int                     @id @default(autoincrement())
+  owner_id              Int
+  title                 String                  @db.VarChar(255)
+  is_default            Boolean
+  security_fos_user     security_fos_user       @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_D50162D97E3C61F9")
+  user_dashboard_config user_dashboard_config[]
+
+  @@index([owner_id], map: "IDX_D50162D97E3C61F9")
+}
+
+model user_dashboard_config {
+  id                       Int                      @id @default(autoincrement())
+  user_id                  Int
+  visualisation_id         Int
+  layout_id                Int?
+  sortOrder                Int
+  dash_board_visualisation dash_board_visualisation @relation(fields: [visualisation_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_46A4649A1A36181E")
+  dashboard_layout         dashboard_layout?        @relation(fields: [layout_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_46A4649A8C22AA1A")
+  security_fos_user        security_fos_user        @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_46A4649AA76ED395")
+
+  @@index([visualisation_id], map: "IDX_46A4649A1A36181E")
+  @@index([layout_id], map: "IDX_46A4649A8C22AA1A")
+  @@index([user_id], map: "IDX_46A4649AA76ED395")
+}
+
+model n_ejecutivo_cuenta_coordinador {
+  id                  Int @id @default(autoincrement())
+  ejecutivo_cuenta_id Int
+  coordinador_id      Int
+}
+
+model n_mobile_variables {
+  id             Int      @id @default(autoincrement())
+  variable_name  String   @db.VarChar(100)
+  slug           String   @db.VarChar(100)
+  created_at     DateTime @db.DateTime(0)
+  updated_at     DateTime @db.DateTime(0)
+  variable_value String   @db.LongText
+  variable_type  String   @db.VarChar(50)
+}
+
+model n_centro_medico {
+  id                 Int                  @id @default(autoincrement())
+  codigo             String?              @db.VarChar(30)
+  nombre             String               @db.VarChar(150)
+  activo             Boolean
+  c_incapacidad_ccss c_incapacidad_ccss[]
+}
+
+model a_mobile_token_for_planillas {
+  id          Int      @id @default(autoincrement())
+  empleado_id Int
+  token       String   @db.LongText
+  created_at  DateTime @db.DateTime(0)
+  expires_at  DateTime @db.DateTime(0)
 }
