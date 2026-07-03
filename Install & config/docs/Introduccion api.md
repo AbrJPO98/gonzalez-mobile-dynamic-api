@@ -41,7 +41,7 @@ En particular, el archivo:
 
 - `Listado de tablas nuevas y originales del schema.md`
 
-incluye el bloque de **“Total preexistentes”**, donde se listan las tablas preexistentes que han sido modeladas en Prisma. Cambios en estas tablas requieren atención especial (ver sección 6).
+incluye el bloque de **“Total preexistentes”**, donde se listan las tablas preexistentes que han sido modeladas en Prisma. Cambios en estas tablas requieren atención especial (ver sección 7).
 
 ---
 
@@ -61,7 +61,21 @@ USE `db_name`;
 
 ---
 
-### 4. Configuración de Prisma
+### 4. Variables de entorno (`.env`)
+
+Antes de configurar Prisma o iniciar la API, los usuarios **deben crear un archivo `.env` en la raíz del proyecto**, tomando como referencia el contenido de `.env.example` (no modificar `.env.example`).
+
+Ejemplo:
+
+```bash
+cp .env.example .env
+```
+
+Luego editar `.env` y completar cada variable con los valores correspondientes (conexión a la base de datos, secretos JWT, tokens de acceso, URL de planillas, etc.), según los comentarios de `.env.example`.
+
+---
+
+### 5. Configuración de Prisma
 
 Después de hacer cambios en la base de datos, ejecuta en la raíz del proyecto el comando:
 
@@ -81,7 +95,7 @@ para actualizar/modificar el cliente de Prisma con esos cambios.
 
 ---
 
-### 5. Inicio de la API
+### 6. Inicio de la API
 
 Después de ejecutar los comandos de Prisma anteriores, para iniciar la API en desarrollo digita en la **raíz del proyecto**:
 
@@ -93,7 +107,7 @@ Para ejecutarse en el **servicio brindado** (despliegue / entorno de producción
 
 ---
 
-### 6. Cambios en tablas preexistentes y flujo de trabajo
+### 7. Cambios en tablas preexistentes y flujo de trabajo
 
 La API dinámica está pensada para **no interferir con el flujo de trabajo normal de la empresa**, pero es importante coordinar cambios en las tablas preexistentes.
 
@@ -119,7 +133,7 @@ En particular:
 
 ---
 
-### 7. Resumen
+### 8. Resumen
 
 - La API dinámica de este proyecto está construida con **Next.js + Prisma**.
 - Antes de trabajar con tablas y modelos, se deben revisar:
@@ -129,6 +143,8 @@ En particular:
 - Para adaptar la base de datos a cambios de MonitoreApp:
   - Ejecutar `USE \`db_name\`;`
   - Ejecutar `Install & config/docs/Cambios_BD_MonitoreApp.sql`.
+- Variables de entorno:
+  - Crear un archivo `.env` en la raíz del proyecto a partir de `.env.example` (por ejemplo, `cp .env.example .env`) y completar los valores indicados en ese ejemplo.
 - Después de cambios en base de datos:
   - Ejecutar `npx prisma db pull`.
   - Ejecutar `npx prisma generate`.
