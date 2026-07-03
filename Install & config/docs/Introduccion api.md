@@ -41,7 +41,7 @@ En particular, el archivo:
 
 - `Listado de tablas nuevas y originales del schema.md`
 
-incluye el bloque de **“Total preexistentes”**, donde se listan las tablas preexistentes que han sido modeladas en Prisma. Cambios en estas tablas requieren atención especial (ver sección 5).
+incluye el bloque de **“Total preexistentes”**, donde se listan las tablas preexistentes que han sido modeladas en Prisma. Cambios en estas tablas requieren atención especial (ver sección 6).
 
 ---
 
@@ -81,7 +81,19 @@ para actualizar/modificar el cliente de Prisma con esos cambios.
 
 ---
 
-### 5. Cambios en tablas preexistentes y flujo de trabajo
+### 5. Inicio de la API
+
+Después de ejecutar los comandos de Prisma anteriores, para iniciar la API en desarrollo digita en la **raíz del proyecto**:
+
+```bash
+npm run dev
+```
+
+Para ejecutarse en el **servicio brindado** (despliegue / entorno de producción o el que opere el equipo receptor), el usuario tiene **libertad para modificar las instrucciones de inicio** (por ejemplo, el comando de arranque, el puerto, el orquestador o el empaquetado del proceso), **siempre que no se altere el funcionamiento de los endpoints brindados** por esta API.
+
+---
+
+### 6. Cambios en tablas preexistentes y flujo de trabajo
 
 La API dinámica está pensada para **no interferir con el flujo de trabajo normal de la empresa**, pero es importante coordinar cambios en las tablas preexistentes.
 
@@ -107,7 +119,7 @@ En particular:
 
 ---
 
-### 6. Resumen
+### 7. Resumen
 
 - La API dinámica de este proyecto está construida con **Next.js + Prisma**.
 - Antes de trabajar con tablas y modelos, se deben revisar:
@@ -120,5 +132,8 @@ En particular:
 - Después de cambios en base de datos:
   - Ejecutar `npx prisma db pull`.
   - Ejecutar `npx prisma generate`.
+- Para iniciar la API en desarrollo (raíz del proyecto):
+  - Ejecutar `npm run dev`.
+- En el servicio brindado se pueden modificar las instrucciones de inicio, pero **no** el funcionamiento de los endpoints brindados.
 - Cualquier cambio en tablas preexistentes:
   - Requiere actualizar `schema.prisma`, probar los flujos afectados y coordinar con **Udevs** para mantener la API dinámica alineada con la base de referencia.
