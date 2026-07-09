@@ -1,29 +1,17 @@
 -- Motor objetivo: MySQL (InnoDB, utf8mb4)
 --
--- Esta sección "Tablas nuevas" se regenera desde app/prisma/schema.prisma mediante:
---   npx prisma migrate diff --from-empty --to-schema-datamodel app/prisma/schema.prisma --script > "Install & config/docs/_prisma_full_diff.sql"
---   node scripts/sync-monitoreapp-sql-from-prisma.mjs
+-- Solo tablas nuevas MonitoreApp ("Total creadas" del Listado oficial).
+-- NO modifica tablas preexistentes (sin ALTER corporativo).
+-- Las columnas que referencian tablas preexistentes se crean; las FOREIGN KEY hacia ellas se omiten.
+-- FK entre tablas creadas: 36 | FK omitidas (→ preexistentes u otras): 80
+--
+-- Fuente: Cambios_BD_MonitoreApp.sql
+-- Regenerar: node scripts/build-cambios-bd-solo-tablas-creadas.mjs
 --
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- =============================
--- Cambios en tablas corporativas preexistentes (no creadas por este script)
--- =============================
-ALTER TABLE `c_accion_personal` ADD COLUMN `mobile_upload` BOOLEAN NULL;
-ALTER TABLE `c_cambio_guardia` ADD COLUMN `mobile_upload` BOOLEAN NULL;
-ALTER TABLE `c_empleado` ADD COLUMN `firma_manual` LONGTEXT NULL;
-ALTER TABLE `c_empleado` ADD COLUMN `ingresado` BOOLEAN NOT NULL DEFAULT FALSE;
-ALTER TABLE `c_marca_dia` ADD COLUMN `usuarioMarcaEntrada` VARCHAR(191) NULL;
-ALTER TABLE `c_salida_anticipada` ADD COLUMN `empleado_id` INT NULL;
-ALTER TABLE `c_salida_anticipada` ADD COLUMN `motivo` LONGTEXT NULL;
-ALTER TABLE `e_estructura_puesto` ADD COLUMN `coordenadas_gpslat` VARCHAR(255) NULL;
-ALTER TABLE `e_estructura_puesto` ADD COLUMN `coordenadas_gpslng` VARCHAR(255) NULL;
-ALTER TABLE `e_estructura_articulo_corpo_puesto_entrega` ADD COLUMN `modelo` VARCHAR(255) NULL;
-CREATE INDEX `c_salida_anticipada_empleado_id_fkey` ON `c_salida_anticipada` (`empleado_id`);
-ALTER TABLE `c_salida_anticipada` ADD CONSTRAINT `c_salida_anticipada_empleado_id_fkey` FOREIGN KEY (`empleado_id`) REFERENCES `c_empleado`(`id`) ON DELETE CASCADE;
-
--- =============================
--- Tablas nuevas (MonitoreApp) — columnas alineadas con Prisma
+-- Creación tablas nuevas MonitoreApp (84 tablas)
 -- =============================
 
 CREATE TABLE IF NOT EXISTS `a_recovery_password_token` (
@@ -1416,125 +1404,43 @@ CREATE TABLE IF NOT EXISTS `e_reportes_mobile` (
     `progress` INT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- =============================
--- Relaciones (FK) — generadas desde Prisma (tablas del listado MonitoreApp)
+-- Relaciones (FK) — solo entre tablas creadas
 -- =============================
-ALTER TABLE `a_recovery_password_token` ADD CONSTRAINT `FK_E35A23BC952BE730` FOREIGN KEY (`empleadoId`) REFERENCES `c_empleado`(`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-ALTER TABLE `c_agenda_minuta` ADD CONSTRAINT `c_agenda_minuta_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_agenda_minuta` ADD CONSTRAINT `c_agenda_minuta_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_agenda_minuta` ADD CONSTRAINT `c_agenda_minuta_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_anexos_quejas` ADD CONSTRAINT `c_anexos_quejas_queja_id_fkey` FOREIGN KEY (`queja_id`) REFERENCES `c_maestro_quejas`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_apertura_cierre_puesto` ADD CONSTRAINT `c_apertura_cierre_puesto_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_apertura_cierre_puesto` ADD CONSTRAINT `c_apertura_cierre_puesto_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_apertura_cierre_puesto` ADD CONSTRAINT `c_apertura_cierre_puesto_division_id_fkey` FOREIGN KEY (`division_id`) REFERENCES `n_division`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_apertura_cierre_puesto` ADD CONSTRAINT `c_apertura_cierre_puesto_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_archivos_adjuntos_articulo_mantenimiento` ADD CONSTRAINT `c_archivos_adjuntos_articulo_mantenimiento_activo_mantenimi_fkey` FOREIGN KEY (`activo_mantenimiento_id`) REFERENCES `c_articulo_mantenimiento`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_archivos_aporte_incidente` ADD CONSTRAINT `c_archivos_aporte_incidente_contribucion_id_fkey` FOREIGN KEY (`contribucion_id`) REFERENCES `c_contribucion_incidente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_archivos_incidente` ADD CONSTRAINT `c_archivos_incidente_incidente_id_fkey` FOREIGN KEY (`incidente_id`) REFERENCES `c_incidente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_articulo_mantenimiento` ADD CONSTRAINT `c_articulo_mantenimiento_articulo_asignado_id_fkey` FOREIGN KEY (`articulo_asignado_id`) REFERENCES `e_estructura_articulo_corpo_puesto_entrega`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_articulo_mantenimiento` ADD CONSTRAINT `c_articulo_mantenimiento_articulo_plan_id_fkey` FOREIGN KEY (`articulo_plan_id`) REFERENCES `e_estructura_articulo_corpo_puesto_plan`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_boleta_apreciacion_vulnerabilidad` ADD CONSTRAINT `c_boleta_apreciacion_vulnerabilidad_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_boleta_apreciacion_vulnerabilidad` ADD CONSTRAINT `c_boleta_apreciacion_vulnerabilidad_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_boleta_apreciacion_vulnerabilidad` ADD CONSTRAINT `c_boleta_apreciacion_vulnerabilidad_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_checklist_supervision` ADD CONSTRAINT `c_checklist_supervision_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_checklist_supervision` ADD CONSTRAINT `c_checklist_supervision_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_checklist_supervision` ADD CONSTRAINT `c_checklist_supervision_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_contribucion_incidente` ADD CONSTRAINT `c_contribucion_incidente_empleado_id_fkey` FOREIGN KEY (`empleado_id`) REFERENCES `c_empleado`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_contribucion_incidente` ADD CONSTRAINT `c_contribucion_incidente_incidente_id_fkey` FOREIGN KEY (`incidente_id`) REFERENCES `c_incidente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_empleado_almuerzo` ADD CONSTRAINT `c_empleado_almuerzo_empleadoId_fkey` FOREIGN KEY (`empleadoId`) REFERENCES `c_empleado`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_empleado_notification` ADD CONSTRAINT `c_empleado_notification_empleadoId_fkey` FOREIGN KEY (`empleadoId`) REFERENCES `c_empleado`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_empleado_notification` ADD CONSTRAINT `c_empleado_notification_notificationId_fkey` FOREIGN KEY (`notificationId`) REFERENCES `c_notifications`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_encuesta_cliente` ADD CONSTRAINT `c_encuesta_cliente_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_encuesta_cliente` ADD CONSTRAINT `c_encuesta_cliente_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_encuesta_cliente` ADD CONSTRAINT `c_encuesta_cliente_division_id_fkey` FOREIGN KEY (`division_id`) REFERENCES `n_division`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_encuesta_cliente` ADD CONSTRAINT `c_encuesta_cliente_empresa_id_fkey` FOREIGN KEY (`empresa_id`) REFERENCES `e_estructura_empresa`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_encuesta_cliente` ADD CONSTRAINT `c_encuesta_cliente_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_encuesta_cliente` ADD CONSTRAINT `c_encuesta_cliente_responsable_id_fkey` FOREIGN KEY (`responsable_id`) REFERENCES `c_empleado`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_evaluacion_empleado` ADD CONSTRAINT `c_evaluacion_empleado_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_evaluacion_empleado` ADD CONSTRAINT `c_evaluacion_empleado_plaza_id_fkey` FOREIGN KEY (`plaza_id`) REFERENCES `e_estructura_plazas`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_evaluacion_empleado` ADD CONSTRAINT `c_evaluacion_empleado_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 ALTER TABLE `c_imagenes_acta_entrega_producto` ADD CONSTRAINT `c_imagenes_acta_entrega_producto_acta_id_fkey` FOREIGN KEY (`acta_id`) REFERENCES `c_acta_entre_producto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_imagenes_apertura_cierre_puesto` ADD CONSTRAINT `c_imagenes_apertura_cierre_puesto_apetura_cierre_id_fkey` FOREIGN KEY (`apetura_cierre_id`) REFERENCES `c_apertura_cierre_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_imagenes_control_asistencia` ADD CONSTRAINT `c_imagenes_control_asistencia_control_id_fkey` FOREIGN KEY (`control_id`) REFERENCES `c_control_asistencia`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_imagenes_vehiculos_corporativos` ADD CONSTRAINT `c_imagenes_vehiculos_corporativos_vehiculo_id_fkey` FOREIGN KEY (`vehiculo_id`) REFERENCES `c_vehiculos_corporativos`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_incidente` ADD CONSTRAINT `c_incidente_clasificacion_fkey` FOREIGN KEY (`clasificacion`) REFERENCES `n_clasificacion_incidente`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_incidente` ADD CONSTRAINT `c_incidente_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_incidente` ADD CONSTRAINT `c_incidente_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_incidente` ADD CONSTRAINT `c_incidente_ejecutivo_cuenta_fkey` FOREIGN KEY (`ejecutivo_cuenta`) REFERENCES `n_ejecutivo_cuenta`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_incidente` ADD CONSTRAINT `c_incidente_empresa_id_fkey` FOREIGN KEY (`empresa_id`) REFERENCES `e_estructura_empresa`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 ALTER TABLE `c_mantenimiento_vehiculos_corporativos` ADD CONSTRAINT `c_mantenimiento_vehiculos_corporativos_vehiculo_id_fkey` FOREIGN KEY (`vehiculo_id`) REFERENCES `c_vehiculos_corporativos`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_movimientos_articulo_mantenimiento` ADD CONSTRAINT `c_movimientos_articulo_mantenimiento_articulo_asignado_id_fkey` FOREIGN KEY (`articulo_asignado_id`) REFERENCES `e_estructura_articulo_corpo_puesto_entrega`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_movimientos_articulo_mantenimiento` ADD CONSTRAINT `c_movimientos_articulo_mantenimiento_articulo_plan_id_fkey` FOREIGN KEY (`articulo_plan_id`) REFERENCES `e_estructura_articulo_corpo_puesto_plan`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_notas_voz` ADD CONSTRAINT `c_notas_voz_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_notas_voz` ADD CONSTRAINT `c_notas_voz_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `c_notas_voz` ADD CONSTRAINT `c_notas_voz_empresa_id_fkey` FOREIGN KEY (`empresa_id`) REFERENCES `e_estructura_empresa`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 ALTER TABLE `c_plaza_notification` ADD CONSTRAINT `c_plaza_notification_notificationId_fkey` FOREIGN KEY (`notificationId`) REFERENCES `c_notifications`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_plaza_notification` ADD CONSTRAINT `c_plaza_notification_plazaId_fkey` FOREIGN KEY (`plazaId`) REFERENCES `e_estructura_plazas`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_producto_no_conforme` ADD CONSTRAINT `c_producto_no_conforme_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_producto_no_conforme` ADD CONSTRAINT `c_producto_no_conforme_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_puesto_notas` ADD CONSTRAINT `c_puesto_notas_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_registro_induccion_general` ADD CONSTRAINT `c_registro_induccion_general_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_registro_induccion_general` ADD CONSTRAINT `c_registro_induccion_general_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_registro_induccion_general` ADD CONSTRAINT `c_registro_induccion_general_empresa_id_fkey` FOREIGN KEY (`empresa_id`) REFERENCES `e_estructura_empresa`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_solicitud_permiso` ADD CONSTRAINT `c_solicitud_permiso_empleado_id_fkey` FOREIGN KEY (`empleado_id`) REFERENCES `c_empleado`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_usos_vehiculos_corporativos` ADD CONSTRAINT `c_usos_vehiculos_corporativos_vehiculo_id_fkey` FOREIGN KEY (`vehiculo_id`) REFERENCES `c_vehiculos_corporativos`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_vehiculos_corporativos` ADD CONSTRAINT `c_vehiculos_corporativos_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `c_vehiculos_corporativos` ADD CONSTRAINT `c_vehiculos_corporativos_sucursal_id_fkey` FOREIGN KEY (`sucursal_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `e_activo_visitante` ADD CONSTRAINT `FK_BB503B25992BE739` FOREIGN KEY (`visitante_id`) REFERENCES `e_registro_personas`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `e_activo_visitante` ADD CONSTRAINT `FK_BB503B25993BE739` FOREIGN KEY (`tipo_id`) REFERENCES `n_tipo_activo_visitas`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 ALTER TABLE `e_archivos_manual_puesto` ADD CONSTRAINT `e_archivos_manual_puesto_manual_puesto_id_fkey` FOREIGN KEY (`manual_puesto_id`) REFERENCES `e_manual_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `e_archivos_producto_no_conforme` ADD CONSTRAINT `e_archivos_producto_no_conforme_pnc_id_fkey` FOREIGN KEY (`pnc_id`) REFERENCES `c_producto_no_conforme`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `e_capacitacion_empleado` ADD CONSTRAINT `e_capacitacion_empleado_capacitacion_id_fkey` FOREIGN KEY (`capacitacion_id`) REFERENCES `e_registro_capacitaciones`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `e_capacitacion_empleado` ADD CONSTRAINT `e_capacitacion_empleado_empleado_id_fkey` FOREIGN KEY (`empleado_id`) REFERENCES `c_empleado`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 ALTER TABLE `e_capacitacion_puesto` ADD CONSTRAINT `e_capacitacion_puesto_capacitacion_id_fkey` FOREIGN KEY (`capacitacion_id`) REFERENCES `e_registro_capacitaciones`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `e_capacitacion_puesto` ADD CONSTRAINT `e_capacitacion_puesto_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `e_control_documento_entregado_cliente` ADD CONSTRAINT `e_control_documento_entregado_cliente_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_control_documento_entregado_cliente` ADD CONSTRAINT `e_control_documento_entregado_cliente_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `e_empleado_visualizacion_archivos` ADD CONSTRAINT `e_empleado_visualizacion_archivos_visualizacion_id_fkey` FOREIGN KEY (`visualizacion_id`) REFERENCES `e_empleado_visualizacion_manual_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_empleado_visualizacion_manual_puesto` ADD CONSTRAINT `e_empleado_visualizacion_manual_puesto_empleado_id_fkey` FOREIGN KEY (`empleado_id`) REFERENCES `c_empleado`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `e_empleado_visualizacion_manual_puesto` ADD CONSTRAINT `e_empleado_visualizacion_manual_puesto_manual_puesto_id_fkey` FOREIGN KEY (`manual_puesto_id`) REFERENCES `e_manual_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_llave` ADD CONSTRAINT `e_llave_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_llave` ADD CONSTRAINT `e_llave_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_llave` ADD CONSTRAINT `e_llave_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `e_llave_en_llavero` ADD CONSTRAINT `e_llave_en_llavero_llave_id_fkey` FOREIGN KEY (`llave_id`) REFERENCES `e_llave`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `e_llave_en_llavero` ADD CONSTRAINT `e_llave_en_llavero_llavero_id_fkey` FOREIGN KEY (`llavero_id`) REFERENCES `e_llavero`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_llavero` ADD CONSTRAINT `e_llavero_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_llavero` ADD CONSTRAINT `e_llavero_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_llavero` ADD CONSTRAINT `e_llavero_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `e_movimiento_llave` ADD CONSTRAINT `e_movimiento_llave_llave_id_fkey` FOREIGN KEY (`llave_id`) REFERENCES `e_llave`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `e_movimiento_llavero` ADD CONSTRAINT `e_movimiento_llavero_llavero_id_fkey` FOREIGN KEY (`llavero_id`) REFERENCES `e_llavero`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_mutuos_acuerdos` ADD CONSTRAINT `e_mutuos_acuerdos_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `e_mutuos_acuerdos` ADD CONSTRAINT `e_mutuos_acuerdos_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `e_mutuos_acuerdos` ADD CONSTRAINT `e_mutuos_acuerdos_ejecutivo_cuenta_fkey` FOREIGN KEY (`ejecutivo_cuenta`) REFERENCES `n_ejecutivo_cuenta`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
 ALTER TABLE `e_puestos_manual_puesto` ADD CONSTRAINT `e_puestos_manual_puesto_manual_puesto_id_fkey` FOREIGN KEY (`manual_puesto_id`) REFERENCES `e_manual_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_puestos_manual_puesto` ADD CONSTRAINT `e_puestos_manual_puesto_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_registro_capacitaciones` ADD CONSTRAINT `e_registro_capacitaciones_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `e_registro_capacitaciones` ADD CONSTRAINT `e_registro_capacitaciones_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `e_registro_capacitaciones` ADD CONSTRAINT `e_registro_capacitaciones_empresa_id_fkey` FOREIGN KEY (`empresa_id`) REFERENCES `e_estructura_empresa`(`id`) ON DELETE NO ACTION ON UPDATE CASCADE;
-ALTER TABLE `e_registro_entrega_puesto` ADD CONSTRAINT `e_registro_entrega_puesto_cliente_id_fkey` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_registro_entrega_puesto` ADD CONSTRAINT `e_registro_entrega_puesto_corpo_id_fkey` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_registro_entrega_puesto` ADD CONSTRAINT `e_registro_entrega_puesto_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_registro_personas` ADD CONSTRAINT `FK_BB503B25992BE730` FOREIGN KEY (`responsable_id`) REFERENCES `c_empleado`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_registro_personas` ADD CONSTRAINT `FK_BB603B25953BE730` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_registro_personas` ADD CONSTRAINT `FK_BB703B25954BE730` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_registro_personas` ADD CONSTRAINT `FK_BB803B25955BE730` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_registro_vehiculos` ADD CONSTRAINT `FK_BB503B25952BE730` FOREIGN KEY (`responsable_id`) REFERENCES `c_empleado`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_registro_vehiculos` ADD CONSTRAINT `FK_BB503B25953BE730` FOREIGN KEY (`cliente_id`) REFERENCES `e_estructura_cliente`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_registro_vehiculos` ADD CONSTRAINT `FK_BB503B25954BE730` FOREIGN KEY (`corpo_id`) REFERENCES `e_estructura_sucursal`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_registro_vehiculos` ADD CONSTRAINT `FK_BB503B25955BE730` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `n_tipo_mantenimiento_articulo` ADD CONSTRAINT `n_tipo_mantenimiento_articulo_articulo_id_fkey` FOREIGN KEY (`articulo_id`) REFERENCES `n_articulo_corpo_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `refresh_token` ADD CONSTRAINT `refresh_token_empleadoId_fkey` FOREIGN KEY (`empleadoId`) REFERENCES `c_empleado`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_imagenes_registro_induccion_general` ADD CONSTRAINT `c_imagenes_registro_induccion_general_registro_id_fkey` FOREIGN KEY (`registro_id`) REFERENCES `c_registro_induccion_general`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `e_actividades_puesto` ADD CONSTRAINT `e_actividades_puesto_actividad_id_fkey` FOREIGN KEY (`actividad_id`) REFERENCES `e_actividades`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_actividades_puesto` ADD CONSTRAINT `e_actividades_puesto_puesto_id_fkey` FOREIGN KEY (`puesto_id`) REFERENCES `e_estructura_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `e_actividades_puesto_plaza` ADD CONSTRAINT `e_actividades_puesto_plaza_actividad_puesto_id_fkey` FOREIGN KEY (`actividad_puesto_id`) REFERENCES `e_actividades_puesto`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE `e_actividades_puesto_plaza` ADD CONSTRAINT `e_actividades_puesto_plaza_plaza_id_fkey` FOREIGN KEY (`plaza_id`) REFERENCES `e_estructura_plazas`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_imagenes_checklist_supervision` ADD CONSTRAINT `c_imagenes_checklist_supervision_checklist_id_fkey` FOREIGN KEY (`checklist_id`) REFERENCES `c_checklist_supervision`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_imagenes_puesto_notas` ADD CONSTRAINT `c_imagenes_puesto_notas_nota_id_fkey` FOREIGN KEY (`nota_id`) REFERENCES `c_puesto_notas`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_archivos_solicitud_permiso` ADD CONSTRAINT `c_archivos_solicitud_permiso_solicitud_id_fkey` FOREIGN KEY (`solicitud_id`) REFERENCES `c_solicitud_permiso`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `c_archivos_adjuntos_capacitaciones` ADD CONSTRAINT `fk_capacitaciones` FOREIGN KEY (`capacitacion_id`) REFERENCES `e_registro_capacitaciones`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 ALTER TABLE `c_imagenes_boleta_apreciacion_vulnerabilidad` ADD CONSTRAINT `fk_boleta_apreciacion_vulnerabilidad` FOREIGN KEY (`boleta_id`) REFERENCES `c_boleta_apreciacion_vulnerabilidad`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 ALTER TABLE `c_control_asistencia_empleado_firmas` ADD CONSTRAINT `fk_control_asistencia` FOREIGN KEY (`control_id`) REFERENCES `c_control_asistencia`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
-
 SET FOREIGN_KEY_CHECKS = 1;

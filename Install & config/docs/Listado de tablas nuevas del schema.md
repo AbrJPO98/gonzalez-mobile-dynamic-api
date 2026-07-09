@@ -1,7 +1,5 @@
 ## Total creadas: 84
 
-Listado canónico (orden): `scripts/monitoreapp-new-tables.mjs` (`MONITOREAPP_NEW_TABLES`). El mismo array alimenta `Cambios_BD_MonitoreApp.sql` y `Tablas nuevas del schema.txt`.
-
 1. `a_recovery_password_token`
 2. `a_mobile_token_for_planillas`
 3. `c_acta_entre_producto`
@@ -86,28 +84,3 @@ Listado canónico (orden): `scripts/monitoreapp-new-tables.mjs` (`MONITOREAPP_NE
 82. `c_archivos_adjuntos_capacitaciones`
 83. `c_imagenes_boleta_apreciacion_vulnerabilidad`
 84. `e_reportes_mobile`
-
-### Total preexistentes: 22
-
-1. `c_accion_personal`
-2. `c_cambio_guardia`
-3. `c_empleado`
-4. `c_empleado_plaza`
-5. `c_horario`
-6. `c_marca_dia`
-7. `c_salida_anticipada`
-8. `c_tipo_accion`
-9. `e_estructura_articulo_corpo_puesto_entrega`
-10. `e_estructura_articulo_corpo_puesto_plan`
-11. `e_estructura_cliente`
-12. `e_estructura_combo_articulo_cp`
-13. `e_estructura_contrato`
-14. `e_estructura_empresa`
-15. `e_estructura_plazas`
-16. `e_estructura_puesto`
-17. `e_estructura_sucursal`
-18. `n_articulo_corpo_puesto`
-19. `n_division`
-20. `n_ejecutivo_cuenta`
-21. `pg_categoria_empleado`
-22. `pg_categoria_salarial`
