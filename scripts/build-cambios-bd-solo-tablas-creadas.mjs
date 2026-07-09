@@ -75,13 +75,13 @@ function sourceTable(fkLine) {
     return m ? m[1] : null;
 }
 
-const listadoPath = path.join(root, "Install & config", "docs", "Listado de tablas nuevas y originales del schema.md");
+const listadoPath = path.join(root, "Install & config", "docs", "Listado de tablas nuevas del schema.md");
 const cambiosPath = path.join(root, "Install & config", "docs", "Cambios_BD_MonitoreApp.sql");
-const outPath = path.join(root, "Install & config", "docs", "Cambios_BD_MonitoreApp_solo_tablas_creadas.sql");
+const outPath = path.join(root, "Install & config", "docs", "Cambios_BD_MonitoreApp.sql");
 
 const listadoRaw = fs.readFileSync(listadoPath, "utf8");
 const preexistentRaw = listadoRaw.split("### Total preexistentes")[1] ?? "";
-const preexistentSet = parseListadoTableNames(preexistentRaw);
+const preexistentSet = preexistentRaw ? parseListadoTableNames(preexistentRaw) : new Set();
 const crearSet = new Set(MONITOREAPP_NEW_TABLES);
 
 const cambiosFull = fs.readFileSync(cambiosPath, "utf8");

@@ -3,7 +3,7 @@
 -- Solo tablas nuevas MonitoreApp ("Total creadas" del Listado oficial).
 -- NO modifica tablas preexistentes (sin ALTER corporativo).
 -- Las columnas que referencian tablas preexistentes se crean; las FOREIGN KEY hacia ellas se omiten.
--- FK entre tablas creadas: 36 | FK omitidas (→ preexistentes u otras): 80
+-- FK entre tablas creadas: 36 | FK omitidas (→ preexistentes u otras): 0
 --
 -- Fuente: Cambios_BD_MonitoreApp.sql
 -- Regenerar: node scripts/build-cambios-bd-solo-tablas-creadas.mjs
@@ -11,7 +11,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- =============================
--- Creación tablas nuevas MonitoreApp (84 tablas)
+-- Creación tablas nuevas MonitoreApp (86 tablas)
 -- =============================
 
 CREATE TABLE IF NOT EXISTS `a_recovery_password_token` (
@@ -387,6 +387,23 @@ CREATE TABLE IF NOT EXISTS `c_empleado_notification` (
     `watched` TINYINT(1) NOT NULL DEFAULT 0,
     INDEX `c_empleado_notification_notificationId_fkey`(`notificationId`),
     INDEX `c_plaza_notification_empleadoId_fkey`(`empleadoId`),
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `c_empleado_firma_digital` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `firma` LONGTEXT NOT NULL,
+    `empleado_id` INT NOT NULL,
+    `created_at` DATETIME(0) NOT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `c_empleado_razon_ausencia` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `marca_id` INT NOT NULL,
+    `empleado_id` INT NOT NULL,
+    `razon` LONGTEXT NOT NULL,
+    `created_at` DATE NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

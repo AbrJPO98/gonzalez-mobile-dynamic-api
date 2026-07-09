@@ -8,12 +8,11 @@ Cada bloque es una copia literal del modelo en Prisma. El conjunto y orden de ta
 
 // ===== a_recovery_password_token =====
 model a_recovery_password_token {
-  id         Int        @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
   expira_en  Int
-  creacion   DateTime   @db.DateTime(0)
-  token      String     @db.VarChar(255)
+  creacion   DateTime @db.DateTime(0)
+  token      String   @db.VarChar(255)
   empleadoId Int
-  c_empleado c_empleado @relation(fields: [empleadoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_E35A23BC952BE730")
 
   @@index([empleadoId], map: "FK_E35A23BC952BE730")
 }
@@ -57,31 +56,28 @@ model c_acta_entre_producto {
 
 // ===== c_agenda_minuta =====
 model c_agenda_minuta {
-  id                    Int                   @id @default(autoincrement())
-  cliente_id            Int
-  corpo_id              Int
-  puesto_id             Int
-  numero                Int
-  titulo                String                @db.VarChar(255)
-  fecha                 DateTime              @db.Date
-  hora_inicio           DateTime              @db.Time(0)
-  hora_fin              DateTime              @db.Time(0)
-  autor                 String                @db.LongText
-  participantes         String                @db.LongText
-  acuerdos              String                @db.LongText
-  observaciones         String                @db.LongText
-  firma_responsable     String                @db.LongText
-  created_at            DateTime              @default(now())
-  created_by            String
-  temas_a_tratar        String?               @db.LongText
-  empresa_id            Int                   @default(0)
-  division_id           Int                   @default(0)
-  contrato_id           Int                   @default(0)
-  isActive              Boolean               @default(true)
-  estado                Boolean               @default(false)
-  e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
-  e_estructura_puesto   e_estructura_puesto   @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
+  id                Int      @id @default(autoincrement())
+  cliente_id        Int
+  corpo_id          Int
+  puesto_id         Int
+  numero            Int
+  titulo            String   @db.VarChar(255)
+  fecha             DateTime @db.Date
+  hora_inicio       DateTime @db.Time(0)
+  hora_fin          DateTime @db.Time(0)
+  autor             String   @db.LongText
+  participantes     String   @db.LongText
+  acuerdos          String   @db.LongText
+  observaciones     String   @db.LongText
+  firma_responsable String   @db.LongText
+  created_at        DateTime @default(now())
+  created_by        String
+  temas_a_tratar    String?  @db.LongText
+  empresa_id        Int      @default(0)
+  division_id       Int      @default(0)
+  contrato_id       Int      @default(0)
+  isActive          Boolean  @default(true)
+  estado            Boolean  @default(false)
 
   @@index([cliente_id], map: "c_agenda_minuta_cliente_id_fkey")
   @@index([corpo_id], map: "c_agenda_minuta_corpo_id_fkey")
@@ -125,10 +121,6 @@ model c_apertura_cierre_puesto {
   empresa_id                            Int                                 @default(0)
   contrato_id                           Int                                 @default(0)
   isActive                              Boolean                             @default(true)
-  e_estructura_cliente                  e_estructura_cliente                @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  e_estructura_sucursal                 e_estructura_sucursal               @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
-  n_division                            n_division                          @relation(fields: [division_id], references: [id], onDelete: Cascade)
-  e_estructura_puesto                   e_estructura_puesto                 @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
   c_imagenes_apertura_cierre_puesto     c_imagenes_apertura_cierre_puesto[]
 
   @@index([cliente_id], map: "c_apertura_cierre_puesto_cliente_id_fkey")
@@ -216,8 +208,6 @@ model c_articulo_mantenimiento {
   created_at                                 DateTime                                     @db.DateTime(0)
   updated_at                                 DateTime                                     @db.DateTime(0)
   c_archivos_adjuntos_articulo_mantenimiento c_archivos_adjuntos_articulo_mantenimiento[]
-  e_estructura_articulo_corpo_puesto_entrega e_estructura_articulo_corpo_puesto_entrega?  @relation(fields: [articulo_asignado_id], references: [id], onDelete: Cascade)
-  e_estructura_articulo_corpo_puesto_plan    e_estructura_articulo_corpo_puesto_plan?     @relation(fields: [articulo_plan_id], references: [id], onDelete: Cascade)
 
   @@index([articulo_asignado_id], map: "c_articulo_mantenimiento_articulo_asignado_id_fkey")
   @@index([articulo_plan_id], map: "c_articulo_mantenimiento_articulo_plan_id_fkey")
@@ -263,9 +253,6 @@ model c_boleta_apreciacion_vulnerabilidad {
   division_id                                  Int                                            @default(0)
   contrato_id                                  Int                                            @default(0)
   isActive                                     Boolean                                        @default(true)
-  e_estructura_cliente                         e_estructura_cliente                           @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  e_estructura_sucursal                        e_estructura_sucursal                          @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
-  e_estructura_puesto                          e_estructura_puesto                            @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
   c_imagenes_boleta_apreciacion_vulnerabilidad c_imagenes_boleta_apreciacion_vulnerabilidad[]
 
   @@index([cliente_id], map: "c_boleta_apreciacion_vulnerabilidad_cliente_id_fkey")
@@ -307,9 +294,6 @@ model c_checklist_supervision {
   empresa_id                       Int                                @default(0)
   contrato_id                      Int                                @default(0)
   isActive                         Boolean                            @default(true)
-  e_estructura_cliente             e_estructura_cliente               @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  e_estructura_sucursal            e_estructura_sucursal              @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
-  e_estructura_puesto              e_estructura_puesto                @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
   c_imagenes_checklist_supervision c_imagenes_checklist_supervision[]
 
   @@index([cliente_id], map: "c_checklist_supervision_cliente_id_fkey")
@@ -328,7 +312,6 @@ model c_contribucion_incidente {
   firma_aporte_tercero        String?                       @db.LongText
   nombre_aporte               String?
   c_archivos_aporte_incidente c_archivos_aporte_incidente[]
-  c_empleado                  c_empleado                    @relation(fields: [empleado_id], references: [id], onDelete: Cascade)
   c_incidente                 c_incidente                   @relation(fields: [incidente_id], references: [id], onDelete: Cascade)
 
   @@index([empleado_id], map: "c_contribucion_incidente_empleado_id_fkey")
@@ -374,25 +357,24 @@ model c_control_asistencia_empleado_firmas {
 
 // ===== c_empleado_almuerzo =====
 model c_empleado_almuerzo {
-  id               Int        @id @default(autoincrement())
+  id               Int      @id @default(autoincrement())
   empleadoId       Int
-  pausas           String     @db.LongText
-  inicio           DateTime   @db.DateTime(0)
-  fin              DateTime   @db.DateTime(0)
-  es_manual        Boolean    @default(false)
-  cedula_empleado  String     @db.LongText
-  empleado_nombre  String     @db.LongText
-  firma_empleado   String     @db.LongText
+  pausas           String   @db.LongText
+  inicio           DateTime @db.DateTime(0)
+  fin              DateTime @db.DateTime(0)
+  es_manual        Boolean  @default(false)
+  cedula_empleado  String   @db.LongText
+  empleado_nombre  String   @db.LongText
+  firma_empleado   String   @db.LongText
   minutos_almuerzo Float
-  empresa_id       Int        @default(0)
-  cliente_id       Int        @default(0)
-  division_id      Int        @default(0)
-  contrato_id      Int        @default(0)
-  corpo_id         Int        @default(0)
-  puesto_id        Int        @default(0)
-  isActive         Boolean    @default(true)
+  empresa_id       Int      @default(0)
+  cliente_id       Int      @default(0)
+  division_id      Int      @default(0)
+  contrato_id      Int      @default(0)
+  corpo_id         Int      @default(0)
+  puesto_id        Int      @default(0)
+  isActive         Boolean  @default(true)
   marca_id         Int
-  c_empleado       c_empleado @relation(fields: [empleadoId], references: [id], onDelete: Cascade)
 
   @@index([empleadoId], map: "empleadoId_almuerzo_fkey")
 }
@@ -423,43 +405,53 @@ model c_empleado_notification {
   empleadoId      Int
   notificationId  Int
   watched         Boolean         @default(false)
-  c_empleado      c_empleado      @relation(fields: [empleadoId], references: [id], onDelete: Cascade)
   c_notifications c_notifications @relation(fields: [notificationId], references: [id], onDelete: Cascade)
 
   @@index([notificationId], map: "c_empleado_notification_notificationId_fkey")
   @@index([empleadoId], map: "c_plaza_notification_empleadoId_fkey")
 }
 
+// ===== c_empleado_firma_digital =====
+model c_empleado_firma_digital {
+  id          Int      @id @default(autoincrement())
+  firma       String   @db.LongText
+  empleado_id Int
+  created_at  DateTime @db.DateTime(0)
+}
+
+// ===== c_empleado_razon_ausencia =====
+model c_empleado_razon_ausencia {
+  id          Int      @id @default(autoincrement())
+  marca_id    Int
+  empleado_id Int
+  razon       String   @db.LongText
+  created_at  DateTime @db.Date
+}
+
 // ===== c_encuesta_cliente =====
 model c_encuesta_cliente {
-  id                    Int                   @id @default(autoincrement())
-  empresa_id            Int
-  cliente_id            Int
-  corpo_id              Int
-  puesto_id             Int
-  division_id           Int
-  responsable_id        Int
-  fecha                 DateTime              @db.Date
-  evaluaciones          String                @db.LongText
-  created_at            DateTime              @db.DateTime(0)
-  firma_responsable     String                @db.LongText
-  nombre_evaluado       String                @db.VarChar(45)
-  cedula_evaluado       String                @db.VarChar(25)
-  cedula_responsable    String                @db.VarChar(25)
-  nombre_responsable    String                @db.VarChar(45)
-  email_evaluado        String                @db.VarChar(50)
-  firma_evaluado        String?               @db.LongText
-  telefono_evaluado     String                @db.VarChar(25)
-  empresa_evaluado      String                @db.VarChar(55)
-  observaciones         String                @db.LongText
-  contrato_id           Int                   @default(0)
-  isActive              Boolean               @default(true)
-  e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: NoAction)
-  e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: NoAction)
-  n_division            n_division            @relation(fields: [division_id], references: [id], onDelete: NoAction)
-  e_estructura_empresa  e_estructura_empresa  @relation(fields: [empresa_id], references: [id], onDelete: NoAction)
-  e_estructura_puesto   e_estructura_puesto   @relation(fields: [puesto_id], references: [id], onDelete: NoAction)
-  c_empleado            c_empleado            @relation(fields: [responsable_id], references: [id], onDelete: NoAction)
+  id                 Int      @id @default(autoincrement())
+  empresa_id         Int
+  cliente_id         Int
+  corpo_id           Int
+  puesto_id          Int
+  division_id        Int
+  responsable_id     Int
+  fecha              DateTime @db.Date
+  evaluaciones       String   @db.LongText
+  created_at         DateTime @db.DateTime(0)
+  firma_responsable  String   @db.LongText
+  nombre_evaluado    String   @db.VarChar(45)
+  cedula_evaluado    String   @db.VarChar(25)
+  cedula_responsable String   @db.VarChar(25)
+  nombre_responsable String   @db.VarChar(45)
+  email_evaluado     String   @db.VarChar(50)
+  firma_evaluado     String?  @db.LongText
+  telefono_evaluado  String   @db.VarChar(25)
+  empresa_evaluado   String   @db.VarChar(55)
+  observaciones      String   @db.LongText
+  contrato_id        Int      @default(0)
+  isActive           Boolean  @default(true)
 
   @@index([cliente_id], map: "c_encuesta_cliente_cliente_id_fkey")
   @@index([corpo_id], map: "c_encuesta_cliente_corpo_id_fkey")
@@ -471,32 +463,29 @@ model c_encuesta_cliente {
 
 // ===== c_evaluacion_empleado =====
 model c_evaluacion_empleado {
-  id                    Int                   @id @default(autoincrement())
-  nombre_empleado       String                @db.VarChar(45)
-  cedula_empleado       String                @db.VarChar(45)
+  id                    Int      @id @default(autoincrement())
+  nombre_empleado       String   @db.VarChar(45)
+  cedula_empleado       String   @db.VarChar(45)
   corpo_id              Int
   puesto_id             Int
   plaza_id              Int
   empleado_id           Int
   evaluador_id          Int
-  tipo                  String                @db.VarChar(25)
-  fecha_ingreso         DateTime              @db.Date
-  fecha_evaluacion      DateTime              @db.Date
-  evaluacion            String                @db.LongText
-  comentarios           String                @db.LongText
-  nombre_evaluador      String                @db.VarChar(45)
-  firma_evaluador       String                @db.LongText
-  firma_empleado        String?               @db.LongText
-  created_at            DateTime              @db.DateTime(0)
-  firma_empleado_manual String?               @db.LongText
-  empresa_id            Int                   @default(0)
-  cliente_id            Int                   @default(0)
-  division_id           Int                   @default(0)
-  contrato_id           Int                   @default(0)
-  isActive              Boolean               @default(false)
-  e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: NoAction)
-  e_estructura_plazas   e_estructura_plazas   @relation(fields: [plaza_id], references: [id], onDelete: NoAction)
-  e_estructura_puesto   e_estructura_puesto   @relation(fields: [puesto_id], references: [id], onDelete: NoAction)
+  tipo                  String   @db.VarChar(25)
+  fecha_ingreso         DateTime @db.Date
+  fecha_evaluacion      DateTime @db.Date
+  evaluacion            String   @db.LongText
+  comentarios           String   @db.LongText
+  nombre_evaluador      String   @db.VarChar(45)
+  firma_evaluador       String   @db.LongText
+  firma_empleado        String?  @db.LongText
+  created_at            DateTime @db.DateTime(0)
+  firma_empleado_manual String?  @db.LongText
+  empresa_id            Int      @default(0)
+  cliente_id            Int      @default(0)
+  division_id           Int      @default(0)
+  contrato_id           Int      @default(0)
+  isActive              Boolean  @default(false)
 
   @@index([corpo_id], map: "c_evaluacion_empleado_corpo_id_fkey")
   @@index([plaza_id], map: "c_evaluacion_empleado_plaza_id_fkey")
@@ -597,10 +586,6 @@ model c_incidente {
   c_archivos_incidente        c_archivos_incidente[]
   c_contribucion_incidente    c_contribucion_incidente[]
   n_clasificacion_incidente   n_clasificacion_incidente  @relation(fields: [clasificacion], references: [id], onDelete: NoAction)
-  e_estructura_cliente        e_estructura_cliente       @relation(fields: [cliente_id], references: [id], onDelete: NoAction)
-  e_estructura_sucursal       e_estructura_sucursal      @relation(fields: [corpo_id], references: [id], onDelete: NoAction)
-  n_ejecutivo_cuenta          n_ejecutivo_cuenta         @relation(fields: [ejecutivo_cuenta], references: [id], onDelete: NoAction)
-  e_estructura_empresa        e_estructura_empresa       @relation(fields: [empresa_id], references: [id], onDelete: NoAction)
 
   @@index([clasificacion], map: "c_incidente_clasificacion_fkey")
   @@index([cliente_id], map: "c_incidente_cliente_id_fkey")
@@ -668,22 +653,20 @@ model c_mantenimiento_vehiculos_corporativos {
 
 // ===== c_movimientos_articulo_mantenimiento =====
 model c_movimientos_articulo_mantenimiento {
-  id                                         Int                                         @id @default(autoincrement())
-  articulo_plan_id                           Int?
-  articulo_asignado_id                       Int?
-  nombre_persona_recibe                      String                                      @db.VarChar(255)
-  nombre_persona_entrega                     String                                      @db.VarChar(255)
-  departamento                               String                                      @db.VarChar(255)
-  telefono                                   String                                      @db.VarChar(20)
-  entrega                                    String                                      @db.VarChar(255)
-  recibe                                     String                                      @db.VarChar(255)
-  fecha                                      DateTime                                    @db.Date
-  hora                                       DateTime                                    @db.Time(0)
-  firma_entrega                              String?                                     @db.LongText
-  firma_recibe                               String?                                     @db.LongText
-  firma_responsable                          String                                      @db.LongText
-  e_estructura_articulo_corpo_puesto_entrega e_estructura_articulo_corpo_puesto_entrega? @relation(fields: [articulo_asignado_id], references: [id], onDelete: Cascade)
-  e_estructura_articulo_corpo_puesto_plan    e_estructura_articulo_corpo_puesto_plan?    @relation(fields: [articulo_plan_id], references: [id], onDelete: Cascade)
+  id                     Int      @id @default(autoincrement())
+  articulo_plan_id       Int?
+  articulo_asignado_id   Int?
+  nombre_persona_recibe  String   @db.VarChar(255)
+  nombre_persona_entrega String   @db.VarChar(255)
+  departamento           String   @db.VarChar(255)
+  telefono               String   @db.VarChar(20)
+  entrega                String   @db.VarChar(255)
+  recibe                 String   @db.VarChar(255)
+  fecha                  DateTime @db.Date
+  hora                   DateTime @db.Time(0)
+  firma_entrega          String?  @db.LongText
+  firma_recibe           String?  @db.LongText
+  firma_responsable      String   @db.LongText
 
   @@index([articulo_asignado_id], map: "c_movimientos_articulo_mantenimiento_articulo_asignado_id_fkey")
   @@index([articulo_plan_id], map: "c_movimientos_articulo_mantenimiento_articulo_plan_id_fkey")
@@ -691,24 +674,21 @@ model c_movimientos_articulo_mantenimiento {
 
 // ===== c_notas_voz =====
 model c_notas_voz {
-  id                    Int                   @id @default(autoincrement())
-  empresa_id            Int
-  cliente_id            Int
-  corpo_id              Int
-  puesto_id             Int?
-  titulo                String                @db.LongText
-  descripcion           String                @db.LongText
-  path                  String                @db.LongText
-  transcripcion         String                @db.LongText
-  firma_responsable     String                @db.LongText
-  created_by            Int
-  created_at            DateTime              @db.DateTime(0)
-  division_id           Int                   @default(0)
-  contrato_id           Int                   @default(0)
-  isActive              Boolean               @default(true)
-  e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: NoAction)
-  e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: NoAction)
-  e_estructura_empresa  e_estructura_empresa  @relation(fields: [empresa_id], references: [id], onDelete: NoAction)
+  id                Int      @id @default(autoincrement())
+  empresa_id        Int
+  cliente_id        Int
+  corpo_id          Int
+  puesto_id         Int?
+  titulo            String   @db.LongText
+  descripcion       String   @db.LongText
+  path              String   @db.LongText
+  transcripcion     String   @db.LongText
+  firma_responsable String   @db.LongText
+  created_by        Int
+  created_at        DateTime @db.DateTime(0)
+  division_id       Int      @default(0)
+  contrato_id       Int      @default(0)
+  isActive          Boolean  @default(true)
 
   @@index([cliente_id], map: "c_notas_voz_cliente_id_fkey")
   @@index([corpo_id], map: "c_notas_voz_corpo_id_fkey")
@@ -727,12 +707,11 @@ model c_notifications {
 
 // ===== c_plaza_notification =====
 model c_plaza_notification {
-  id                  Int                 @id @default(autoincrement())
-  plazaId             Int
-  notificationId      Int
-  watched             Boolean             @default(false)
-  c_notifications     c_notifications     @relation(fields: [notificationId], references: [id], onDelete: Cascade)
-  e_estructura_plazas e_estructura_plazas @relation(fields: [plazaId], references: [id], onDelete: Cascade)
+  id              Int             @id @default(autoincrement())
+  plazaId         Int
+  notificationId  Int
+  watched         Boolean         @default(false)
+  c_notifications c_notifications @relation(fields: [notificationId], references: [id], onDelete: Cascade)
 
   @@index([notificationId], map: "c_plaza_notification_notificationId_fkey")
   @@index([plazaId], map: "c_plaza_notification_plazaId_fkey")
@@ -762,8 +741,6 @@ model c_producto_no_conforme {
   contrato_id                     Int
   puesto_id                       Int
   isActive                        Boolean                           @default(true)
-  e_estructura_cliente            e_estructura_cliente              @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  e_estructura_sucursal           e_estructura_sucursal             @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
   e_archivos_producto_no_conforme e_archivos_producto_no_conforme[]
 
   @@index([cliente_id], map: "c_producto_no_conforme_cliente_id_fkey")
@@ -790,7 +767,6 @@ model c_puesto_notas {
   corpo_id                 Int                       @default(0)
   isActive                 Boolean                   @default(true)
   c_imagenes_puesto_notas  c_imagenes_puesto_notas[]
-  e_estructura_puesto      e_estructura_puesto       @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
 
   @@index([puesto_id], map: "puesto_id_notas_fkey")
 }
@@ -824,9 +800,6 @@ model c_registro_induccion_general {
   puesto_id                             Int                                     @default(0)
   isActive                              Boolean                                 @default(true)
   c_imagenes_registro_induccion_general c_imagenes_registro_induccion_general[]
-  e_estructura_cliente                  e_estructura_cliente                    @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  e_estructura_sucursal                 e_estructura_sucursal                   @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
-  e_estructura_empresa                  e_estructura_empresa                    @relation(fields: [empresa_id], references: [id], onDelete: Cascade)
 
   @@index([cliente_id], map: "c_registro_induccion_general_cliente_id_fkey")
   @@index([corpo_id], map: "c_registro_induccion_general_corpo_id_fkey")
@@ -889,7 +862,6 @@ model c_solicitud_permiso {
   motivo                         String                         @db.LongText
   firma_empleado_manual          String                         @db.LongText
   c_archivos_solicitud_permiso   c_archivos_solicitud_permiso[]
-  c_empleado                     c_empleado                     @relation(fields: [empleado_id], references: [id], onDelete: Cascade)
 
   @@index([empleado_id], map: "c_solicitud_permiso_empleado_id_fkey")
 }
@@ -977,8 +949,6 @@ model c_vehiculos_corporativos {
   c_imagenes_vehiculos_corporativos      c_imagenes_vehiculos_corporativos[]
   c_mantenimiento_vehiculos_corporativos c_mantenimiento_vehiculos_corporativos[]
   c_usos_vehiculos_corporativos          c_usos_vehiculos_corporativos[]
-  e_estructura_cliente                   e_estructura_cliente                     @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  e_estructura_sucursal                  e_estructura_sucursal                    @relation(fields: [sucursal_id], references: [id], onDelete: Cascade)
 
   @@index([cliente_id], map: "c_vehiculos_corporativos_cliente_id_fkey")
   @@index([sucursal_id], map: "c_vehiculos_corporativos_sucursal_id_fkey")
@@ -1003,7 +973,6 @@ model e_actividades_puesto {
   actividad_id               Int
   puesto_id                  Int
   e_actividades              e_actividades                @relation(fields: [actividad_id], references: [id], onDelete: Cascade)
-  e_estructura_puesto        e_estructura_puesto          @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
   e_actividades_puesto_plaza e_actividades_puesto_plaza[]
 
   @@index([actividad_id], map: "e_actividad_id_fkey")
@@ -1022,7 +991,6 @@ model e_actividades_puesto_plaza {
   updated_at           DateTime
   marcada              Boolean              @default(false)
   e_actividades_puesto e_actividades_puesto @relation(fields: [actividad_puesto_id], references: [id], onDelete: Cascade)
-  e_estructura_plazas  e_estructura_plazas  @relation(fields: [plaza_id], references: [id], onDelete: Cascade)
 
   @@index([actividad_puesto_id], map: "e_actividad_actividad_puesto_id_fkey")
   @@index([plaza_id], map: "e_actividad_puesto_plaza_id_fkey")
@@ -1076,7 +1044,6 @@ model e_capacitacion_empleado {
   capacitacion_id           Int
   empleado_id               Int
   e_registro_capacitaciones e_registro_capacitaciones @relation(fields: [capacitacion_id], references: [id], onDelete: NoAction)
-  c_empleado                c_empleado                @relation(fields: [empleado_id], references: [id], onDelete: NoAction)
 
   @@index([capacitacion_id], map: "e_capacitacion_empleado_capacitacion_id_fkey")
   @@index([empleado_id], map: "e_capacitacion_empleado_empleado_id_fkey")
@@ -1088,7 +1055,6 @@ model e_capacitacion_puesto {
   capacitacion_id           Int
   puesto_id                 Int
   e_registro_capacitaciones e_registro_capacitaciones @relation(fields: [capacitacion_id], references: [id], onDelete: NoAction)
-  e_estructura_puesto       e_estructura_puesto       @relation(fields: [puesto_id], references: [id], onDelete: NoAction)
 
   @@index([capacitacion_id], map: "e_capacitacion_puesto_capacitacion_id_fkey")
   @@index([puesto_id], map: "e_capacitacion_puesto_puesto_id_fkey")
@@ -1096,23 +1062,21 @@ model e_capacitacion_puesto {
 
 // ===== e_control_documento_entregado_cliente =====
 model e_control_documento_entregado_cliente {
-  id                          Int                   @id @default(autoincrement())
+  id                          Int      @id @default(autoincrement())
   cliente_id                  Int
   corpo_id                    Int
-  fecha                       DateTime              @db.Date
-  nombre_oficial_entrega      String                @db.VarChar(255)
-  nombre_oficial_recibe       String                @db.VarChar(255)
-  tipo_documento              String                @db.VarChar(255)
-  descripcion                 String                @db.LongText
-  firma_representante_cliente String?               @db.LongText
-  firma_responsable           String                @db.LongText
-  empresa_id                  Int                   @default(0)
-  contrato_id                 Int                   @default(0)
-  puesto_id                   Int                   @default(0)
-  isActive                    Boolean               @default(true)
-  division_id                 Int                   @default(0)
-  e_estructura_cliente        e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  e_estructura_sucursal       e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
+  fecha                       DateTime @db.Date
+  nombre_oficial_entrega      String   @db.VarChar(255)
+  nombre_oficial_recibe       String   @db.VarChar(255)
+  tipo_documento              String   @db.VarChar(255)
+  descripcion                 String   @db.LongText
+  firma_representante_cliente String?  @db.LongText
+  firma_responsable           String   @db.LongText
+  empresa_id                  Int      @default(0)
+  contrato_id                 Int      @default(0)
+  puesto_id                   Int      @default(0)
+  isActive                    Boolean  @default(true)
+  division_id                 Int      @default(0)
 
   @@index([cliente_id], map: "e_control_documento_entregado_cliente_cliente_id_fkey")
   @@index([corpo_id], map: "e_control_documento_entregado_cliente_corpo_id_fkey")
@@ -1143,7 +1107,6 @@ model e_empleado_visualizacion_manual_puesto {
   updated_at                        DateTime                            @db.DateTime(0)
   approved                          Boolean?
   e_empleado_visualizacion_archivos e_empleado_visualizacion_archivos[]
-  c_empleado                        c_empleado                          @relation(fields: [empleado_id], references: [id], onDelete: Cascade)
   e_manual_puesto                   e_manual_puesto                     @relation(fields: [manual_puesto_id], references: [id], onDelete: Cascade)
 
   @@index([empleado_id], map: "e_empleado_visualizacion_manual_puesto_empleado_id_fkey")
@@ -1152,26 +1115,23 @@ model e_empleado_visualizacion_manual_puesto {
 
 // ===== e_llave =====
 model e_llave {
-  id                    Int                   @id @default(autoincrement())
-  cliente_id            Int
-  corpo_id              Int
-  puesto_id             Int
-  lugar_abre            String                @db.VarChar(255)
-  cantidad_copias       Int
-  observaciones         String                @db.LongText
-  firma_responsable     String                @db.LongText
-  created_by            Int
-  created_at            DateTime              @db.DateTime(0)
-  empresa_id            Int                   @default(0)
-  division_id           Int                   @default(0)
-  isActive              Boolean               @default(false)
-  contrato_id           Int                   @default(0)
-  numero_llave          String                @default("0") @db.VarChar(50)
-  e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
-  e_estructura_puesto   e_estructura_puesto   @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
-  e_llave_en_llavero    e_llave_en_llavero[]
-  e_movimiento_llave    e_movimiento_llave[]
+  id                 Int                  @id @default(autoincrement())
+  cliente_id         Int
+  corpo_id           Int
+  puesto_id          Int
+  lugar_abre         String               @db.VarChar(255)
+  cantidad_copias    Int
+  observaciones      String               @db.LongText
+  firma_responsable  String               @db.LongText
+  created_by         Int
+  created_at         DateTime             @db.DateTime(0)
+  empresa_id         Int                  @default(0)
+  division_id        Int                  @default(0)
+  isActive           Boolean              @default(false)
+  contrato_id        Int                  @default(0)
+  numero_llave       String               @default("0") @db.VarChar(50)
+  e_llave_en_llavero e_llave_en_llavero[]
+  e_movimiento_llave e_movimiento_llave[]
 
   @@index([cliente_id], map: "e_llave_cliente_id_fkey")
   @@index([corpo_id], map: "e_llave_corpo_id_fkey")
@@ -1192,25 +1152,22 @@ model e_llave_en_llavero {
 
 // ===== e_llavero =====
 model e_llavero {
-  id                    Int                    @id @default(autoincrement())
-  cliente_id            Int
-  corpo_id              Int
-  puesto_id             Int
-  observaciones         String                 @db.LongText
-  firma_responsable     String                 @db.LongText
-  created_by            Int
-  created_at            DateTime               @db.DateTime(0)
-  nombre_llavero        String                 @db.VarChar(50)
-  empresa_id            Int                    @default(0)
-  division_id           Int                    @default(0)
-  contrato_id           Int                    @default(0)
-  isActive              Boolean                @default(false)
-  numero_llavero        String                 @default("0") @db.VarChar(50)
-  e_llave_en_llavero    e_llave_en_llavero[]
-  e_estructura_cliente  e_estructura_cliente   @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  e_estructura_sucursal e_estructura_sucursal  @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
-  e_estructura_puesto   e_estructura_puesto    @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
-  e_movimiento_llavero  e_movimiento_llavero[]
+  id                   Int                    @id @default(autoincrement())
+  cliente_id           Int
+  corpo_id             Int
+  puesto_id            Int
+  observaciones        String                 @db.LongText
+  firma_responsable    String                 @db.LongText
+  created_by           Int
+  created_at           DateTime               @db.DateTime(0)
+  nombre_llavero       String                 @db.VarChar(50)
+  empresa_id           Int                    @default(0)
+  division_id          Int                    @default(0)
+  contrato_id          Int                    @default(0)
+  isActive             Boolean                @default(false)
+  numero_llavero       String                 @default("0") @db.VarChar(50)
+  e_llave_en_llavero   e_llave_en_llavero[]
+  e_movimiento_llavero e_movimiento_llavero[]
 
   @@index([cliente_id], map: "e_llavero_cliente_id_fkey")
   @@index([corpo_id], map: "e_llavero_corpo_id_fkey")
@@ -1276,39 +1233,36 @@ model e_movimiento_llavero {
 
 // ===== e_mutuos_acuerdos =====
 model e_mutuos_acuerdos {
-  id                             Int                   @id @default(autoincrement())
-  cliente_id                     Int                   @default(0)
-  corpo_id                       Int                   @default(0)
+  id                             Int       @id @default(autoincrement())
+  cliente_id                     Int       @default(0)
+  corpo_id                       Int       @default(0)
   ejecutivo_cuenta               Int
-  motivo                         String                @db.LongText
-  firma_responsable              String                @db.LongText
-  created_at                     DateTime              @db.DateTime(0)
+  motivo                         String    @db.LongText
+  firma_responsable              String    @db.LongText
+  created_at                     DateTime  @db.DateTime(0)
   created_by                     Int
-  firma_ejecutivo_cuenta_digital String                @db.LongText
+  firma_ejecutivo_cuenta_digital String    @db.LongText
   ausente_acepta                 Boolean
   empleadoAusente_id             Int
   empleadoReemplaza_id           Int
-  firma_ejecutivo_cuenta_manual  String?               @db.LongText
-  marcaDiaAusente_id             Int                   @unique(map: "UNIQ_285F04335FB34B5B")
-  marcaDiaReemplaza_id           Int                   @unique(map: "UNIQ_285F043315ABD58")
+  firma_ejecutivo_cuenta_manual  String?   @db.LongText
+  marcaDiaAusente_id             Int       @unique(map: "UNIQ_285F04335FB34B5B")
+  marcaDiaReemplaza_id           Int       @unique(map: "UNIQ_285F043315ABD58")
   plazaAusente_id                Int
   plazaReemplaza_id              Int
   reemplaza_acepta               Boolean
   cambio_guardia_id              Int?
-  ausente_acepta_at              DateTime?             @db.DateTime(0)
-  reemplaza_acepta_at            DateTime?             @db.DateTime(0)
-  file_name                      String?               @db.VarChar(255)
-  estado                         String                @default("pendiente") @db.VarChar(15)
-  empresa_id                     Int                   @default(0)
-  division_id                    Int                   @default(0)
-  contrato_id                    Int                   @default(0)
-  puesto_id                      Int                   @default(0)
-  isActive                       Boolean               @default(true)
-  firma_ausente_manual           String?               @db.LongText
-  firma_reemplaza_manual         String?               @db.LongText
-  e_estructura_cliente           e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: NoAction)
-  e_estructura_sucursal          e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: NoAction)
-  n_ejecutivo_cuenta             n_ejecutivo_cuenta    @relation(fields: [ejecutivo_cuenta], references: [id], onDelete: NoAction)
+  ausente_acepta_at              DateTime? @db.DateTime(0)
+  reemplaza_acepta_at            DateTime? @db.DateTime(0)
+  file_name                      String?   @db.VarChar(255)
+  estado                         String    @default("pendiente") @db.VarChar(15)
+  empresa_id                     Int       @default(0)
+  division_id                    Int       @default(0)
+  contrato_id                    Int       @default(0)
+  puesto_id                      Int       @default(0)
+  isActive                       Boolean   @default(true)
+  firma_ausente_manual           String?   @db.LongText
+  firma_reemplaza_manual         String?   @db.LongText
 
   @@index([cliente_id], map: "e_mutuos_acuerdos_cliente_id_fkey")
   @@index([corpo_id], map: "e_mutuos_acuerdos_corpo_id_fkey")
@@ -1317,11 +1271,10 @@ model e_mutuos_acuerdos {
 
 // ===== e_puestos_manual_puesto =====
 model e_puestos_manual_puesto {
-  id                  Int                 @id @default(autoincrement())
-  manual_puesto_id    Int
-  puesto_id           Int
-  e_manual_puesto     e_manual_puesto     @relation(fields: [manual_puesto_id], references: [id], onDelete: Cascade)
-  e_estructura_puesto e_estructura_puesto @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
+  id               Int             @id @default(autoincrement())
+  manual_puesto_id Int
+  puesto_id        Int
+  e_manual_puesto  e_manual_puesto @relation(fields: [manual_puesto_id], references: [id], onDelete: Cascade)
 
   @@index([manual_puesto_id], map: "e_puestos_manual_puesto_manual_puesto_id_fkey")
   @@index([puesto_id], map: "e_puestos_manual_puesto_puesto_id_fkey")
@@ -1351,9 +1304,6 @@ model e_registro_capacitaciones {
   c_archivos_adjuntos_capacitaciones c_archivos_adjuntos_capacitaciones[]
   e_capacitacion_empleado            e_capacitacion_empleado[]
   e_capacitacion_puesto              e_capacitacion_puesto[]
-  e_estructura_cliente               e_estructura_cliente                 @relation(fields: [cliente_id], references: [id], onDelete: NoAction)
-  e_estructura_sucursal              e_estructura_sucursal                @relation(fields: [corpo_id], references: [id], onDelete: NoAction)
-  e_estructura_empresa               e_estructura_empresa                 @relation(fields: [empresa_id], references: [id], onDelete: NoAction)
 
   @@index([cliente_id], map: "e_registro_capacitaciones_cliente_id_fkey")
   @@index([corpo_id], map: "e_registro_capacitaciones_corpo_id_fkey")
@@ -1362,34 +1312,31 @@ model e_registro_capacitaciones {
 
 // ===== e_registro_entrega_puesto =====
 model e_registro_entrega_puesto {
-  id                    Int                   @id @default(autoincrement())
+  id                    Int       @id @default(autoincrement())
   cliente_id            Int
   corpo_id              Int
   puesto_id             Int
-  oficial_entrega       String?               @db.VarChar(255)
-  fecha_entrada_entrega DateTime?             @db.Date
-  fecha_salida_entrega  DateTime?             @db.Date
-  hora_entrada_entrega  DateTime?             @db.Time(0)
-  hora_salida_entrega   DateTime?             @db.Time(0)
-  turno_entrega         String?               @db.VarChar(55)
+  oficial_entrega       String?   @db.VarChar(255)
+  fecha_entrada_entrega DateTime? @db.Date
+  fecha_salida_entrega  DateTime? @db.Date
+  hora_entrada_entrega  DateTime? @db.Time(0)
+  hora_salida_entrega   DateTime? @db.Time(0)
+  turno_entrega         String?   @db.VarChar(55)
   marca_entrega_id      Int?
-  oficial_recibe        String                @db.VarChar(255)
-  fecha_entrada_recibe  DateTime              @db.Date
-  fecha_salida_recibe   DateTime              @db.Date
-  hora_entrada_recibe   DateTime              @db.Time(0)
-  hora_salida_recibe    DateTime              @db.Time(0)
-  turno_recibe          String                @db.VarChar(55)
+  oficial_recibe        String    @db.VarChar(255)
+  fecha_entrada_recibe  DateTime  @db.Date
+  fecha_salida_recibe   DateTime  @db.Date
+  hora_entrada_recibe   DateTime  @db.Time(0)
+  hora_salida_recibe    DateTime  @db.Time(0)
+  turno_recibe          String    @db.VarChar(55)
   marca_recibe_id       Int?
-  articulos_puesto      String                @db.LongText
-  observaciones         String                @db.LongText
-  firma_responsable     String                @db.LongText
-  created_at            DateTime              @db.DateTime(0)
+  articulos_puesto      String    @db.LongText
+  observaciones         String    @db.LongText
+  firma_responsable     String    @db.LongText
+  created_at            DateTime  @db.DateTime(0)
   created_by            Int
-  firma_entrega         String?               @db.LongText
-  firma_recibe          String                @db.LongText
-  e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: Cascade)
-  e_estructura_puesto   e_estructura_puesto   @relation(fields: [puesto_id], references: [id], onDelete: Cascade)
+  firma_entrega         String?   @db.LongText
+  firma_recibe          String    @db.LongText
 
   @@index([cliente_id], map: "e_registro_entrega_puesto_cliente_id_fkey")
   @@index([corpo_id], map: "e_registro_entrega_puesto_corpo_id_fkey")
@@ -1398,34 +1345,30 @@ model e_registro_entrega_puesto {
 
 // ===== e_registro_personas =====
 model e_registro_personas {
-  id                    Int                   @id @default(autoincrement())
-  cliente_id            Int
-  corpo_id              Int
-  puesto_id             Int
-  nombre                String                @db.VarChar(75)
-  cedula                String                @db.VarChar(30)
-  hora_entrada          DateTime              @db.DateTime(0)
-  hora_salida           DateTime?             @db.DateTime(0)
-  razon_visita          String                @db.VarChar(75)
-  responsable_id        Int
-  es_funcionario        Boolean
-  observaciones         String?               @db.VarChar(255)
-  tipo_accion           String?               @db.VarChar(15)
-  created_at            DateTime              @db.DateTime(0)
-  updated_at            DateTime              @db.DateTime(0)
-  foto_cedula           String?               @db.LongText
-  pers_autoriza_salida  String?               @db.VarChar(255)
-  dep_pers_visita       String?               @db.VarChar(75)
-  empresa_id            Int
-  division_id           Int
-  contrato_id           Int
-  isActive              Boolean               @default(true)
-  firma_visitante       String?               @db.LongText
-  e_activo_visitante    e_activo_visitante[]
-  c_empleado            c_empleado            @relation(fields: [responsable_id], references: [id], onDelete: Cascade, map: "FK_BB503B25992BE730")
-  e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: Cascade, map: "FK_BB603B25953BE730")
-  e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: Cascade, map: "FK_BB703B25954BE730")
-  e_estructura_puesto   e_estructura_puesto   @relation(fields: [puesto_id], references: [id], onDelete: Cascade, map: "FK_BB803B25955BE730")
+  id                   Int                  @id @default(autoincrement())
+  cliente_id           Int
+  corpo_id             Int
+  puesto_id            Int
+  nombre               String               @db.VarChar(75)
+  cedula               String               @db.VarChar(30)
+  hora_entrada         DateTime             @db.DateTime(0)
+  hora_salida          DateTime?            @db.DateTime(0)
+  razon_visita         String               @db.VarChar(75)
+  responsable_id       Int
+  es_funcionario       Boolean
+  observaciones        String?              @db.VarChar(255)
+  tipo_accion          String?              @db.VarChar(15)
+  created_at           DateTime             @db.DateTime(0)
+  updated_at           DateTime             @db.DateTime(0)
+  foto_cedula          String?              @db.LongText
+  pers_autoriza_salida String?              @db.VarChar(255)
+  dep_pers_visita      String?              @db.VarChar(75)
+  empresa_id           Int
+  division_id          Int
+  contrato_id          Int
+  isActive             Boolean              @default(true)
+  firma_visitante      String?              @db.LongText
+  e_activo_visitante   e_activo_visitante[]
 
   @@index([responsable_id], map: "FK_BB503B25992BE730")
   @@index([cliente_id], map: "FK_BB603B25953BE730")
@@ -1435,31 +1378,27 @@ model e_registro_personas {
 
 // ===== e_registro_vehiculos =====
 model e_registro_vehiculos {
-  id                    Int                   @id @default(autoincrement())
-  cliente_id            Int
-  corpo_id              Int
-  puesto_id             Int
-  tipo                  String                @db.VarChar(20)
-  placa                 String                @db.VarChar(30)
-  nombre                String                @db.VarChar(75)
-  cedula                String                @db.VarChar(30)
-  hora_entrada          DateTime              @db.DateTime(0)
-  hora_salida           DateTime?             @db.DateTime(0)
-  razon_visita          String                @db.LongText
-  responsable_id        Int
-  created_at            DateTime              @db.DateTime(0)
-  updated_at            DateTime              @db.DateTime(0)
-  file_name             String?               @db.LongText
-  departamento_visita   String?               @db.VarChar(255)
-  persona_visita        String?               @db.VarChar(255)
-  empresa_id            Int                   @default(0)
-  division_id           Int                   @default(0)
-  contrato_id           Int                   @default(0)
-  isActive              Boolean               @default(true)
-  c_empleado            c_empleado            @relation(fields: [responsable_id], references: [id], onDelete: Cascade, map: "FK_BB503B25952BE730")
-  e_estructura_cliente  e_estructura_cliente  @relation(fields: [cliente_id], references: [id], onDelete: Cascade, map: "FK_BB503B25953BE730")
-  e_estructura_sucursal e_estructura_sucursal @relation(fields: [corpo_id], references: [id], onDelete: Cascade, map: "FK_BB503B25954BE730")
-  e_estructura_puesto   e_estructura_puesto   @relation(fields: [puesto_id], references: [id], onDelete: Cascade, map: "FK_BB503B25955BE730")
+  id                  Int       @id @default(autoincrement())
+  cliente_id          Int
+  corpo_id            Int
+  puesto_id           Int
+  tipo                String    @db.VarChar(20)
+  placa               String    @db.VarChar(30)
+  nombre              String    @db.VarChar(75)
+  cedula              String    @db.VarChar(30)
+  hora_entrada        DateTime  @db.DateTime(0)
+  hora_salida         DateTime? @db.DateTime(0)
+  razon_visita        String    @db.LongText
+  responsable_id      Int
+  created_at          DateTime  @db.DateTime(0)
+  updated_at          DateTime  @db.DateTime(0)
+  file_name           String?   @db.LongText
+  departamento_visita String?   @db.VarChar(255)
+  persona_visita      String?   @db.VarChar(255)
+  empresa_id          Int       @default(0)
+  division_id         Int       @default(0)
+  contrato_id         Int       @default(0)
+  isActive            Boolean   @default(true)
 
   @@index([responsable_id], map: "FK_BB503B25952BE730")
   @@index([cliente_id], map: "FK_BB503B25953BE730")
@@ -1502,10 +1441,9 @@ model n_tipo_activo_visitas {
 
 // ===== n_tipo_mantenimiento_articulo =====
 model n_tipo_mantenimiento_articulo {
-  id                      Int                     @id @default(autoincrement())
-  articulo_id             Int
-  nombre                  String                  @db.VarChar(255)
-  n_articulo_corpo_puesto n_articulo_corpo_puesto @relation(fields: [articulo_id], references: [id], onDelete: Cascade)
+  id          Int    @id @default(autoincrement())
+  articulo_id Int
+  nombre      String @db.VarChar(255)
 
   @@index([articulo_id], map: "n_tipo_mantenimiento_articulo_articulo_id_fkey")
 }
@@ -1541,15 +1479,14 @@ model n_mobile_variables {
 
 // ===== refresh_token =====
 model refresh_token {
-  id         Int        @id @default(autoincrement())
-  token      String     @unique @db.VarChar(64)
-  createdAt  DateTime   @default(now())
+  id         Int      @id @default(autoincrement())
+  token      String   @unique @db.VarChar(64)
+  createdAt  DateTime @default(now())
   expiresAt  DateTime
-  revoked    Boolean    @default(false)
+  revoked    Boolean  @default(false)
   empleadoId Int
-  sessionId  String     @db.VarChar(36)
-  device     String?    @db.LongText
-  c_empleado c_empleado @relation(fields: [empleadoId], references: [id], onDelete: Cascade)
+  sessionId  String   @db.VarChar(36)
+  device     String?  @db.LongText
 
   @@index([empleadoId])
 }

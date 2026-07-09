@@ -24,6 +24,8 @@ export const MONITOREAPP_NEW_TABLES = [
     "c_empleado_almuerzo",
     "c_login_marca_almuerzo",
     "c_empleado_notification",
+    "c_empleado_firma_digital",
+    "c_empleado_razon_ausencia",
     "c_encuesta_cliente",
     "c_evaluacion_empleado",
     "c_imagenes_acta_entrega_producto",
