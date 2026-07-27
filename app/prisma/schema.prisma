@@ -1454,3 +1454,21 @@ model c_empleado_razon_ausencia {
   razon       String   @db.LongText
   created_at  DateTime @db.Date
 }
+
+model a_mobile_fcm_device {
+  id          Int      @id @default(autoincrement())
+  empleado_id Int
+  plaza_id    Int?
+  token       String   @unique(map: "uniq_a_mobile_fcm_device_token") @db.VarChar(512)
+  platform    String   @db.VarChar(20)
+  device_id   String?  @db.VarChar(255)
+  app_version String?  @db.VarChar(50)
+  app_variant String?  @db.VarChar(20)
+  activo      Boolean  @default(true)
+  created_at  DateTime @db.DateTime(0)
+  updated_at  DateTime @db.DateTime(0)
+
+  @@index([activo], map: "idx_a_mobile_fcm_device_activo")
+  @@index([empleado_id], map: "idx_a_mobile_fcm_device_empleado")
+  @@index([empleado_id, plaza_id], map: "idx_a_mobile_fcm_device_empleado_plaza")
+}

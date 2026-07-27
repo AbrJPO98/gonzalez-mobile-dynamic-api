@@ -1,8 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import {
+    deleteUploadObject,
+    getUploadObject,
+    putUploadObject,
+    uploadExistsAnywhere,
+} from "../../../../utils/s3UploadsStorage";
+import { normalizeUploadRelativePath, toUploadApiUrl } from "../../../../utils/uploadPath";
 import { verifyAccessToken } from "../../../../utils/verifyToken";
 import { verifyTokenFromBody } from "../../../../utils/verifyTokenFromBody";
 
@@ -107,41 +113,6 @@ const parseBoolean = (value: string | null | undefined, defaultValue = false): b
     return v === "1" || v === "true" || v === "yes";
 };
 
-const resolveUploadsPath = (inputPath: string): { absolutePath: string; relativePath: string } => {
-    const uploadsRoot = path.resolve(process.cwd(), "public", "uploads");
-    let cleaned = decodeURIComponent(String(inputPath || ""))
-        .replace(/\\/g, "/")
-        .replace(/^\/+/, "")
-        .trim();
-
-    if (!cleaned) {
-        throw new Error("La ruta del archivo/carpeta es obligatoria");
-    }
-    if (cleaned.startsWith("public/")) {
-        cleaned = cleaned.slice("public/".length);
-    }
-    if (cleaned.startsWith("uploads/")) {
-        cleaned = cleaned.slice("uploads/".length);
-    }
-
-    const normalizedPosix = path.posix.normalize(cleaned);
-    if (
-        normalizedPosix === "." ||
-        normalizedPosix.startsWith("../") ||
-        normalizedPosix.includes("/../") ||
-        normalizedPosix.includes("\0")
-    ) {
-        throw new Error("Ruta inválida");
-    }
-
-    const absolutePath = path.resolve(uploadsRoot, normalizedPosix);
-    if (!(absolutePath === uploadsRoot || absolutePath.startsWith(`${uploadsRoot}${path.sep}`))) {
-        throw new Error("Ruta fuera del directorio permitido");
-    }
-
-    return { absolutePath, relativePath: normalizedPosix.replace(/^\/+/, "") };
-};
-
 const validateAccess = (
     req: NextRequest,
     mobileAccessTokenRaw?: string,
@@ -222,8 +193,7 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const { absolutePath: folderAbsolute, relativePath: folderRelative } = resolveUploadsPath(folderRaw);
-        if (!fs.existsSync(folderAbsolute)) fs.mkdirSync(folderAbsolute, { recursive: true });
+        const folderRelative = normalizeUploadRelativePath(folderRaw);
 
         const savedFiles: any[] = [];
         for (const item of filesInput) {
@@ -263,18 +233,19 @@ export async function POST(req: NextRequest) {
                 );
             }
 
-            const fullPath = path.join(folderAbsolute, finalName);
-            fs.writeFileSync(fullPath, buffer);
+            const relativePath = `${folderRelative}/${finalName}`.replace(/\\/g, "/");
+            const mimeType = item?.mime_type || MIME_BY_EXT[extension] || defaultMimeByKind(kind);
+            await putUploadObject(relativePath, buffer, mimeType);
 
             savedFiles.push({
                 name: finalName,
                 original_name: safeBasename(item?.original_name) || finalName,
                 type: kind,
                 extension: extension || "bin",
-                mime_type: item?.mime_type || MIME_BY_EXT[extension] || defaultMimeByKind(kind),
+                mime_type: mimeType,
                 size_bytes: buffer.length,
-                relative_path: `${folderRelative}/${finalName}`.replace(/\\/g, "/"),
-                url: `/uploads/${folderRelative}/${finalName}`.replace(/\\/g, "/"),
+                relative_path: relativePath,
+                url: toUploadApiUrl(relativePath),
             });
         }
 
@@ -317,15 +288,15 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ status: false, message: "url es obligatorio" }, { status: 400 });
         }
 
-        const { absolutePath, relativePath } = resolveUploadsPath(fileUrl);
-        if (!fs.existsSync(absolutePath)) {
+        const relativePath = normalizeUploadRelativePath(fileUrl);
+        if (!(await uploadExistsAnywhere(relativePath))) {
             return NextResponse.json({ status: false, message: "Archivo no encontrado" }, { status: 404 });
         }
 
-        const fileBuffer = await fs.promises.readFile(absolutePath);
-        const ext = path.extname(absolutePath).toLowerCase().replace(".", "");
+        const fileBuffer = await getUploadObject(relativePath);
+        const ext = path.extname(relativePath).toLowerCase().replace(".", "");
         const contentType = MIME_BY_EXT[ext] || defaultMimeByKind(type) || "application/octet-stream";
-        const fileName = safeBasename(path.basename(absolutePath)) || "archivo";
+        const fileName = safeBasename(path.basename(relativePath)) || "archivo";
 
         const headers: Record<string, string> = {
             "Content-Type": contentType,
@@ -370,20 +341,12 @@ export async function DELETE(req: NextRequest) {
             return NextResponse.json({ status: false, message: "url es obligatorio" }, { status: 400 });
         }
 
-        const { absolutePath, relativePath } = resolveUploadsPath(fileUrl);
-        if (!fs.existsSync(absolutePath)) {
+        const relativePath = normalizeUploadRelativePath(fileUrl);
+        if (!(await uploadExistsAnywhere(relativePath))) {
             return NextResponse.json({ status: false, message: "Archivo no encontrado" }, { status: 404 });
         }
 
-        const stat = await fs.promises.stat(absolutePath);
-        if (stat.isDirectory()) {
-            return NextResponse.json(
-                { status: false, message: "Solo se permite eliminar archivos, no carpetas" },
-                { status: 400 }
-            );
-        }
-
-        await fs.promises.unlink(absolutePath);
+        await deleteUploadObject(relativePath);
 
         const relativeNorm = relativePath.replace(/\\/g, "/");
         return NextResponse.json(
@@ -391,7 +354,7 @@ export async function DELETE(req: NextRequest) {
                 status: true,
                 message: "Archivo eliminado correctamente",
                 relative_path: relativeNorm,
-                url: `/uploads/${relativeNorm}`,
+                url: toUploadApiUrl(relativeNorm),
             },
             { status: 200 }
         );
