@@ -9,8 +9,8 @@ import {
     uploadExistsAnywhere,
 } from "../../../../utils/s3UploadsStorage";
 import { normalizeUploadRelativePath, toUploadApiUrl } from "../../../../utils/uploadPath";
-import { verifyAccessToken } from "../../../../utils/verifyToken";
-import { verifyTokenFromBody } from "../../../../utils/verifyTokenFromBody";
+import { parseBoolean, validateDynamicFilesAccess } from "../../../../utils/dynamicFilesAccess";
+import { buildBinaryFileResponse } from "../../../../utils/fileDownloadResponse";
 
 export const runtime = "nodejs";
 
@@ -107,55 +107,7 @@ const safeBasename = (nameRaw?: string): string => {
     return base.replace(/[<>:"/\\|?*\x00-\x1F]/g, "_");
 };
 
-const parseBoolean = (value: string | null | undefined, defaultValue = false): boolean => {
-    if (value == null) return defaultValue;
-    const v = String(value).trim().toLowerCase();
-    return v === "1" || v === "true" || v === "yes";
-};
-
-const validateAccess = (
-    req: NextRequest,
-    mobileAccessTokenRaw?: string,
-    tokenFromBodyOrQuery?: string,
-    shouldVerifyAccessToken = true
-): NextResponse | null => {
-    const expectedMobileToken = process.env.MOBILE_ACCESS_TOKEN?.trim();
-    const incomingMobileToken = String(
-        mobileAccessTokenRaw || req.headers.get("x-mobile-access-token") || ""
-    ).trim();
-
-    if (!expectedMobileToken) {
-        return NextResponse.json(
-            { status: false, message: "MOBILE_ACCESS_TOKEN no configurado en el servidor" },
-            { status: 500 }
-        );
-    }
-    if (!incomingMobileToken) {
-        return NextResponse.json(
-            { status: false, message: "mobileAccessToken es obligatorio" },
-            { status: 403 }
-        );
-    }
-    if (incomingMobileToken !== expectedMobileToken) {
-        return NextResponse.json(
-            { status: false, message: "mobileAccessToken inválido" },
-            { status: 403 }
-        );
-    }
-
-    const tokenValidationHeader = verifyAccessToken(req);
-    const tokenValidationAlt = verifyTokenFromBody(tokenFromBodyOrQuery);
-    const tokenValidation = tokenValidationHeader.valid ? tokenValidationHeader : tokenValidationAlt;
-
-    if (shouldVerifyAccessToken && !tokenValidation.valid) {
-        return NextResponse.json(
-            { status: false, expired: tokenValidation.expired, message: tokenValidation.message },
-            { status: tokenValidation.expired ? 401 : 403 }
-        );
-    }
-
-    return null;
-};
+const validateAccess = validateDynamicFilesAccess;
 
 export async function POST(req: NextRequest) {
     try {
@@ -298,22 +250,19 @@ export async function GET(req: NextRequest) {
         const contentType = MIME_BY_EXT[ext] || defaultMimeByKind(type) || "application/octet-stream";
         const fileName = safeBasename(path.basename(relativePath)) || "archivo";
 
-        const headers: Record<string, string> = {
-            "Content-Type": contentType,
-            "Cache-Control": "public, max-age=31536000",
-        };
-
-        if (forceDownload) {
-            headers["Content-Disposition"] = `attachment; filename="${encodeURIComponent(fileName)}"`;
-        }
-
         if (type === "text" && !forceDownload) {
-            return new NextResponse(fileBuffer.toString("utf8"), { headers });
+            return new NextResponse(fileBuffer.toString("utf8"), {
+                status: 200,
+                headers: {
+                    "Content-Type": contentType,
+                    "Content-Length": String(fileBuffer.length),
+                    "Cache-Control": "public, max-age=31536000",
+                    "X-Content-Type-Options": "nosniff",
+                },
+            });
         }
 
-        return new NextResponse(Buffer.from(fileBuffer), {
-            headers,
-        });
+        return buildBinaryFileResponse(fileBuffer, contentType, fileName, forceDownload);
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Error desconocido";
         console.error("Error in GET /api/dynamic-prisma/files:", errorMessage);
