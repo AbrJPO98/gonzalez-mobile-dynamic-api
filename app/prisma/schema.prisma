@@ -1478,6 +1478,7 @@ model a_mobile_fcm_device {
 model n_app_module_visibility {
   id          Int     @id @default(autoincrement())
   module_name String  @db.VarChar(50)
+  real_name   String? @db.VarChar(255)
   is_visible  Boolean
 }
 
