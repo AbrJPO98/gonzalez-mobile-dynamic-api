@@ -8,6 +8,7 @@ type DynamicAuthLoginBody = {
     sessionId?: string;
     refreshToken?: string;
     deviceName?: string;
+    empleadoCedula?: string;
     loginMarca?: {
         nombre_empleado?: string;
         cedula_empleado?: string;
@@ -26,6 +27,7 @@ export async function POST(request: NextRequest) {
         const empleadoId = Number(body.empleadoId);
         const sessionId = String(body.sessionId ?? "").trim();
         const refreshToken = String(body.refreshToken ?? "").trim();
+        const empleadoCedula = String(body.empleadoCedula ?? "").trim();
         const deviceName = body.deviceName != null ? String(body.deviceName) : null;
 
         if (!Number.isFinite(empleadoId) || empleadoId <= 0) {
@@ -41,6 +43,14 @@ export async function POST(request: NextRequest) {
         const loginMarca = body.loginMarca ?? {};
         const fechaHora = loginMarca.fecha_hora ? new Date(loginMarca.fecha_hora) : new Date();
         const refreshExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+        let isSuperAdmin = false;
+        const superAdmin = await prisma.n_employees_superadmin.findFirst({
+            where: { employee_cedula: empleadoCedula },
+        });
+        if (superAdmin) {
+            isSuperAdmin = true;
+        }
 
         await prisma.refresh_token.updateMany({
             where: { empleadoId },
@@ -73,6 +83,7 @@ export async function POST(request: NextRequest) {
             {
                 status: true,
                 firmaManual: body.firmaManualFallback ?? null,
+                isSuperAdmin,
             },
             { status: 200 },
         );
