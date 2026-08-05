@@ -5,7 +5,6 @@ export function verifyAccessToken(request: NextRequest) {
     try {
         const authHeader = request.headers.get("authorization");
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            console.log(1);
             return { valid: false, expired: false, payload: null, message: "Token no proporcionado" };
         }
 

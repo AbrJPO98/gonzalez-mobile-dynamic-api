@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 export const verifyTokenFromBody = (token?: string) => {
     try {
         if (!token || String(token).trim().length === 0) {
-            console.log(2);
             return { valid: false, expired: false, payload: null, message: "Token no proporcionado" };
         }
         const decoded = jwt.verify(String(token), process.env.JWT_SECRET);

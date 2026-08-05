@@ -1031,8 +1031,8 @@ model e_mutuos_acuerdos {
   empleadoAusente_id             Int
   empleadoReemplaza_id           Int
   firma_ejecutivo_cuenta_manual  String?   @db.LongText
-  marcaDiaAusente_id             Int       @unique(map: "UNIQ_285F04335FB34B5B")
-  marcaDiaReemplaza_id           Int       @unique(map: "UNIQ_285F043315ABD58")
+  marcas_ausente                 String    @db.LongText
+  marcas_reemplaza               String    @db.LongText
   plazaAusente_id                Int
   plazaReemplaza_id              Int
   reemplaza_acepta               Boolean
@@ -1048,6 +1048,8 @@ model e_mutuos_acuerdos {
   isActive                       Boolean   @default(true)
   firma_ausente_manual           String?   @db.LongText
   firma_reemplaza_manual         String?   @db.LongText
+  fecha_ausente                  DateTime  @db.DateTime(0)
+  fecha_reemplaza                DateTime  @db.DateTime(0)
 
   @@index([cliente_id], map: "e_mutuos_acuerdos_cliente_id_fkey")
   @@index([corpo_id], map: "e_mutuos_acuerdos_corpo_id_fkey")
@@ -1120,7 +1122,7 @@ model e_registro_entrega_puesto {
   firma_entrega         String?   @db.LongText
   firma_recibe          String    @db.LongText
   image_delivery        String?   @db.LongText
-  image_receives        String    @db.LongText
+  image_receives        String?   @db.LongText
 
   @@index([cliente_id], map: "e_registro_entrega_puesto_cliente_id_fkey")
   @@index([corpo_id], map: "e_registro_entrega_puesto_corpo_id_fkey")
@@ -1339,27 +1341,28 @@ model c_imagenes_boleta_apreciacion_vulnerabilidad {
 }
 
 model e_reportes_mobile {
-  id                Int       @id @default(autoincrement())
-  nombre            String    @db.LongText
-  numero            String    @db.VarChar(100)
-  nomenclatura      String    @db.VarChar(100)
-  descripcion       String?   @db.LongText
-  modulo            String    @db.VarChar(100)
-  tipo_reporte      String    @db.VarChar(15)
-  created_by        Int
-  estado            String    @db.VarChar(15)
-  filters           String    @db.LongText
-  order_by          String    @db.LongText
-  firma_responsable String    @db.LongText
-  created_at        DateTime  @default(now()) @db.DateTime(0)
-  attemps           Int?
-  max_attempts      Int?
-  started_at        DateTime? @db.DateTime(0)
-  finished_at       DateTime? @db.DateTime(0)
-  locked_at         DateTime? @db.DateTime(0)
-  locked_by         String?   @db.VarChar(55)
-  error_message     String?   @db.LongText
-  progress          Int?
+  id                     Int                      @id @default(autoincrement())
+  nombre                 String                   @db.LongText
+  numero                 String                   @db.VarChar(100)
+  nomenclatura           String                   @db.VarChar(100)
+  descripcion            String?                  @db.LongText
+  modulo                 String                   @db.VarChar(100)
+  tipo_reporte           String                   @db.VarChar(15)
+  created_by             Int
+  estado                 String                   @db.VarChar(15)
+  filters                String                   @db.LongText
+  order_by               String                   @db.LongText
+  firma_responsable      String                   @db.LongText
+  created_at             DateTime                 @default(now()) @db.DateTime(0)
+  attemps                Int?
+  max_attempts           Int?
+  started_at             DateTime?                @db.DateTime(0)
+  finished_at            DateTime?                @db.DateTime(0)
+  locked_at              DateTime?                @db.DateTime(0)
+  locked_by              String?                  @db.VarChar(55)
+  error_message          String?                  @db.LongText
+  progress               Int?
+  e_reportes_puesto_list e_reportes_puesto_list[]
 }
 
 model n_tipo_entrega {
@@ -1486,4 +1489,29 @@ model n_employees_superadmin {
   id              Int       @id @default(autoincrement())
   employee_cedula String    @unique(map: "employee_cedula") @db.VarChar(50)
   created_at      DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model e_reportes_puesto {
+  id                     Int                      @id @default(autoincrement())
+  nombre                 String                   @db.LongText
+  numero                 String                   @db.VarChar(100)
+  nomenclatura           String                   @db.VarChar(100)
+  descripcion            String?                  @db.LongText
+  puesto_id              Int
+  filters                String                   @db.LongText
+  firma_responsable      String                   @db.LongText
+  created_at             DateTime                 @default(now()) @db.DateTime(0)
+  created_by             Int
+  e_reportes_puesto_list e_reportes_puesto_list[]
+}
+
+model e_reportes_puesto_list {
+  id                Int               @id @default(autoincrement())
+  reporte_puesto_id Int
+  reporte_id        Int
+  e_reportes_mobile e_reportes_mobile @relation(fields: [reporte_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_reporte")
+  e_reportes_puesto e_reportes_puesto @relation(fields: [reporte_puesto_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_reporte_puesto")
+
+  @@index([reporte_id], map: "fk_reporte")
+  @@index([reporte_puesto_id], map: "fk_reporte_puesto")
 }
