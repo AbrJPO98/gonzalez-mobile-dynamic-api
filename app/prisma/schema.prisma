@@ -261,12 +261,17 @@ model c_checklist_supervision {
   division_id                      Int
   corpo_id                         Int
   puesto_id                        Int
+  empleado_id                      Int                                @default(0)
+  empleado_nombre                  String                             @default("") @db.VarChar(255)
+  empleado_codigo                  String                             @default("") @db.VarChar(50)
   ejecutivo_cuenta                 String                             @db.VarChar(55)
   evaluacion                       String                             @db.LongText
   firma_responsable                String                             @db.LongText
   created_by                       Int
   created_at                       DateTime                           @db.DateTime(0)
   fecha                            DateTime                           @db.DateTime(0)
+  hora_inicio                      DateTime                           @default(dbgenerated("'00:00:00'")) @db.Time(0)
+  hora_fin                         DateTime                           @default(dbgenerated("'00:00:00'")) @db.Time(0)
   firma_supervisor                 String?                            @db.LongText
   articulos_puesto                 String                             @db.LongText
   empresa_id                       Int                                @default(0)
